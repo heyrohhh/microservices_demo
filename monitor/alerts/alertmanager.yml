@@ -1,14 +1,10 @@
 global:
   resolve_timeout: 5m
 
-templates:
-  - /etc/alertmanager/email.tmpl
 
 route:
   receiver: telegram-notifications
-  routes:
-    - receiver: email-notifications
-      continue: true
+
 
 receivers:
 - name: telegram-notifications
@@ -17,14 +13,3 @@ receivers:
     chat_id: 8371567382
     send_resolved: true
 
-- name: email-notifications
-  email_configs:
-  - to: "${MAIL_TO}"
-    from: "${MAIL_FROM}"
-    smarthost: "smtp.gmail.com:587"
-    auth_username: "${SMTP_USERNAME}"
-    auth_password: "${SMTP_PASSWORD}"
-    send_resolved: true
-    headers:
-      Subject: '{{ template "email.subject" . }}'
-    html: '{{ template "email.html" . }}'
