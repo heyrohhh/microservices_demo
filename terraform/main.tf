@@ -60,6 +60,9 @@ module "ecs" {
   cpu  = var.cpu
   memory = var.memory
   discovery_arns = module.discovery.service_arns
+  service_scaling = var.service_scaling
+  alb_arn_suffix = var.alb_arn_suffix
+  alb_target_group_arn_suffix = var.alb_target_group_arn_suffix
 }
 
 

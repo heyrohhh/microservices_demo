@@ -77,7 +77,13 @@ variable "alb_target_group_arn" {
     type = string
 }
 
+variable "alb_target_group_arn_suffix" {
+    type = string
+}
 
+variable "alb_arn_suffix" {
+  type = string
+}
 
 variable "alb_listener_arn" {
      type = string
@@ -97,3 +103,12 @@ variable "service_discovery_namespace" {
   type        = string
   default     = "local"  # or whatever your namespace is
 }
+
+
+variable "service_scaling" {
+  type = map(object({
+    min = number
+    max = number
+  }))
+}
+

@@ -46,3 +46,18 @@ variable "cpu" {
 variable "memory" {
   default = "1024"
 }
+
+variable "service_scaling" {
+  type = map(object({
+    min = number
+    max = number
+  }))
+}
+
+variable "alb_target_group_arn_suffix" {
+    type = string
+}
+
+variable "alb_arn_suffix" {
+  type = string
+}
