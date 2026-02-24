@@ -185,17 +185,19 @@ func main() {
 	r.HandleFunc(baseUrl+"/product-meta/{ids}", svc.getProductByID).Methods(http.MethodGet)
 	r.HandleFunc(baseUrl+"/bot", svc.chatBotHandler).Methods(http.MethodPost)
 	r.Handle(baseUrl+"/metrics", promhttp.Handler())
+	r.HandleFunc(baseUrl+"/", svc.homeHandler).Name("/")
+	r.HandleFunc(baseUrl+"/product/{id}", svc.productHandler).Name("product")
+	r.HandleFunc(baseUrl+"/cart", svc.viewCartHandler).Name("cart")
+	r.HandleFunc(baseUrl+"/cart/checkout", svc.placeOrderHandler).Name("checkout")
 
 	var handler http.Handler = r
-	handler = &logHandler{log: log, next: handler}     // add logging
-	handler = ensureSessionID(handler)                 // add session ID
-	handler = otelhttp.NewHandler(handler, "frontend") // add OTel tracing
+	handler = &metricsMiddleware{next: handler}
+	handler = &logHandler{log: log, next: handler}
+	handler = ensureSessionID(handler)
+	handler = otelhttp.NewHandler(handler, "frontend")
 
 	log.Infof("starting server on %s:%s", addr, srvPort)
 	log.Fatal(http.ListenAndServe(addr+":"+srvPort, handler))
-}
-func initStats(log logrus.FieldLogger) {
-	// TODO(arbrown) Implement OpenTelemtry stats
 }
 
 func initTracing(log logrus.FieldLogger, ctx context.Context, svc *frontendServer) (*sdktrace.TracerProvider, error) {
@@ -263,15 +265,24 @@ type metricsMiddleware struct {
 }
 
 func (m *metricsMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
+	if r.URL.Path == "/metrics" {
+		m.next.ServeHTTP(w, r)
+		return
+	}
 
+	logrus.Warn("METRICS MIDDLEWARE HIT")
+
+	start := time.Now()
 	rw := &responseWriter{ResponseWriter: w, statusCode: 200}
 	m.next.ServeHTTP(rw, r)
 
 	duration := time.Since(start).Seconds()
-
-	path := r.URL.Path
 	method := r.Method
+	route := mux.CurrentRoute(r)
+	path := "unknown"
+	if route != nil {
+		path = route.GetName()
+	}
 	status := fmt.Sprintf("%d", rw.statusCode)
 
 	httpRequestsTotal.WithLabelValues(method, path, status).Inc()

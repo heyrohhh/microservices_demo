@@ -115,7 +115,7 @@ services:
       - PRODUCT_CATALOG_SERVICE_ADDR=productcatalogservice:3550
 
   frontend:
-    image: heyrohhh/frontend:v2
+    image: heyrohhh/frontend:v3.0
     container_name: frontend
     networks:
       - microservice-network
@@ -173,7 +173,6 @@ services:
         - "9093:9093"
       volumes:
         - ../monitor/alerts/alertmanager.yml:/etc/alertmanager/alertmanager.yml
-        - ../monitor/alerts/email.tmpl:/etc/alertmanager/email.tmpl
       env_file:
          - .env
       command:

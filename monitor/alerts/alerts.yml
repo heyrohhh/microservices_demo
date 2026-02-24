@@ -1,19 +1,71 @@
 groups:
-- name: frontend-alert
+- name: frontend-alerts
   rules:
+
   - alert: FrontendDown
-    expr: up{job="frontend"} == 0
-    for: 30s
+    expr: sum(up{job="frontend"}) == 0
+    for: 2m
     labels:
       severity: critical
     annotations:
-          summary: frontend is down
-          description: Frontend has been unreachable for 30 seconds
-  - alert: TelegramTest
-    expr: vector(1)
-    for: 10s
+      summary: "CRITICAL: Frontend service is down"
+      description: "All frontend targets are unreachable for more than 2 minutes."
+
+  - alert: FrontendHighCPU
+    expr: avg(ecs_service_cpu_utilization{service_name="frontend"}) > 80
+    for: 10m
     labels:
-     severity: critical
+      severity: warning
     annotations:
-     summary: Telegram test alert
-     description: If you see this, Telegram is wired correctly
+      summary: "High CPU usage on frontend service"
+      description: "Average CPU utilization is above 80% for over 10 minutes."
+
+  - alert: Frontend5xxError
+    expr: |
+      (
+        rate(http_requests_total{job="frontend", status=~"5.."}[5m])
+        /
+        rate(http_requests_total{job="frontend"}[5m])
+      ) > 0.02
+      and
+      rate(http_requests_total{job="frontend"}[5m]) > 1
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High 5xx error rate on frontend"
+      description: "More than 2% of frontend requests are failing for over 2 minutes."
+
+  - alert: FrontendLatencyHigh
+    expr: |
+      histogram_quantile(
+        0.95,
+        sum by (le) (
+          rate(http_request_duration_seconds_bucket{job="frontend"}[5m])
+        )
+      ) > 1
+      and
+      rate(http_requests_total{job="frontend"}[5m]) > 1
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High frontend latency (p95)"
+      description: "Frontend p95 latency is above 1 second for over 2 minutes."
+
+  - alert: FrontendLatencyP99High
+    expr: |
+      histogram_quantile(
+        0.99,
+        sum by (le) (
+          rate(http_request_duration_seconds_bucket{job="frontend"}[5m])
+        )
+      ) > 2
+      and
+      rate(http_requests_total{job="frontend"}[5m]) > 1
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Severe frontend latency (p99)"
+      description: "Frontend p99 latency is above 2 seconds for over 2 minutes."
