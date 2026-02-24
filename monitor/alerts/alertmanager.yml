@@ -7,6 +7,6 @@ route:
 receivers:
 - name: telegram-notifications
   telegram_configs:
-  - bot_token: 8339943182:AAHayO01kS99mSIz_60uXl8L-5zCii-bW6c
+  - bot_token: "${TELEGRAM_BOT_TOKEN}"
     chat_id: 8371567382
     send_resolved: true
