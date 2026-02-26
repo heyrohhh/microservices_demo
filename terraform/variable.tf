@@ -93,3 +93,10 @@ variable "alert_sg_id" {
 variable "alarm_tg" {
   type = string
 }
+variable "grafna_sg_id" {
+  type = string
+}
+
+variable "grafana_tg" {
+  type = string
+}

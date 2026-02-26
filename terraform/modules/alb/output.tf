@@ -37,6 +37,9 @@ output "alarm_tg" {
   value = aws_lb_target_group.alarm_tg
 }
 
+output "grafana_tg" {
+  value = aws_lb_target_group.grafna_tg
+}
 output "alb_prom_id" {
   value = aws_lb.lb_prom.id
   description = "Application Load Balancer ID of prom"

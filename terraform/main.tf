@@ -15,6 +15,7 @@ module "alb" {
   private_subnet_ids = var.private_subnet_ids
   prom_sg_id = var.prom_sg_id
   alert_sg_id = var.alert_sg_id
+  grafna_sg_id = var.grafna_sg_id
 }
 
 module "discovery" {
@@ -56,6 +57,8 @@ module "ecs" {
   service_arns = module.discovery.service_registry_arns
   alert_sg_id = var.alert_sg_id
   alarm_tg = var.alarm_tg
+  grafana_sg_id = var.grafna_sg_id
+  grafana_tg = var.grafana_tg
 }
 
 
