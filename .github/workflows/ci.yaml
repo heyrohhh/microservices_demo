@@ -204,12 +204,10 @@ jobs:
         if: matrix.changed == 'true'
         run: |
           docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
-            ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
-
-          docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
-            ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
-
+          ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
           docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+          docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
+          ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
           docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
 
   deploy-infra:
@@ -242,22 +240,22 @@ jobs:
         run: |
           cd terraform
           terraform plan -out=tfplan \
-            -var-file="terraform.tfvars" \
-            -var="aws_region=us-east-1" \
-            -var="frontend_image=${{ needs.get-registry.outputs.registry }}/frontend:latest" \
-            -var="ad_image=${{ needs.get-registry.outputs.registry }}/adservice:latest" \
-            -var="cart_image=${{ needs.get-registry.outputs.registry }}/cartservice:latest" \
-            -var="checkout_image=${{ needs.get-registry.outputs.registry }}/checkoutservice:latest" \
-            -var="product_image=${{ needs.get-registry.outputs.registry }}/productservice:latest" \
-            -var="shipping_image=${{ needs.get-registry.outputs.registry }}/shippingservice:latest" \
-            -var="payment_image=${{ needs.get-registry.outputs.registry }}/paymentservice:latest" \
-            -var="currency_img=${{ needs.get-registry.outputs.registry }}/currencyservice:latest" \
-            -var="email_Img=${{ needs.get-registry.outputs.registry }}/emailservice:latest" \
-            -var="recomandation_image=${{ needs.get-registry.outputs.registry }}/recommendationservice:latest" \
-            -var="assitant_image=${{ needs.get-registry.outputs.registry }}/shoppingassistant:latest" \
-            -var="load_Img=${{ needs.get-registry.outputs.registry }}/loadgenerator:latest" \
-            -var="prometheus=${{ needs.get-registry.outputs.registry }}/prometheus:latest" \
-            -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:latest"
+          -var-file="terraform.tfvars" \
+          -var="aws_region=us-east-1" \
+          -var="frontend_image=${{ needs.get-registry.outputs.registry }}/frontend:${{ needs.set-version.outputs.version }}" \
+          -var="ad_image=${{ needs.get-registry.outputs.registry }}/adservice:${{ needs.set-version.outputs.version }}" \
+          -var="cart_image=${{ needs.get-registry.outputs.registry }}/cartservice:${{ needs.set-version.outputs.version }}" \
+          -var="checkout_image=${{ needs.get-registry.outputs.registry }}/checkoutservice:${{ needs.set-version.outputs.version }}" \
+          -var="product_image=${{ needs.get-registry.outputs.registry }}/productservice:${{ needs.set-version.outputs.version }}" \
+          -var="shipping_image=${{ needs.get-registry.outputs.registry }}/shippingservice:${{ needs.set-version.outputs.version }}" \
+          -var="payment_image=${{ needs.get-registry.outputs.registry }}/paymentservice:${{ needs.set-version.outputs.version }}" \
+          -var="currency_img=${{ needs.get-registry.outputs.registry }}/currencyservice:${{ needs.set-version.outputs.version }}" \
+          -var="email_Img=${{ needs.get-registry.outputs.registry }}/emailservice:${{ needs.set-version.outputs.version }}" \
+          -var="recomandation_image=${{ needs.get-registry.outputs.registry }}/recommendationservice:${{ needs.set-version.outputs.version }}" \
+          -var="assitant_image=${{ needs.get-registry.outputs.registry }}/shoppingassistant:${{ needs.set-version.outputs.version }}" \
+          -var="load_Img=${{ needs.get-registry.outputs.registry }}/loadgenerator:${{ needs.set-version.outputs.version }}" \
+          -var="prometheus=${{ needs.get-registry.outputs.registry }}/prometheus:${{ needs.set-version.outputs.version }}" \
+          -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:${{ needs.set-version.outputs.version }}"
 
       - name: Terraform apply
         run: cd terraform && terraform apply -auto-approve tfplan
