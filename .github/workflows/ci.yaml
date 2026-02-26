@@ -223,7 +223,6 @@ jobs:
         run: |
           cd terraform
           terraform plan -out=tfplan \
-          -var-file="terraform.tfvars" \
           -var="aws_region=us-east-1" \
           -var="frontend_image=${{ needs.codeInteg.outputs.registry }}/frontend:latest" \
           -var="ad_image=${{ needs.codeInteg.outputs.registry }}/adservice:latest" \
