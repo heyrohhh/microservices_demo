@@ -14,7 +14,7 @@
 # limitations under the License.
 
 FROM --platform=$BUILDPLATFORM eclipse-temurin:24.0.2_12-jdk-noble@sha256:dacac8e9a0df0d2bd24e702b4431132875c249930b70555ebd7ca285b5bee684 AS builder
-
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY ["build.gradle", "gradlew", "./"]
@@ -23,7 +23,6 @@ RUN chmod +x gradlew
 RUN ./gradlew downloadRepos
 
 COPY . .
-RUN apk update && apk upgrade --no-cache
 RUN chmod +x gradlew
 RUN ./gradlew installDist
 
