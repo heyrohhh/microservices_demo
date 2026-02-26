@@ -134,3 +134,39 @@ resource "aws_lb_listener_rule" "alert_rule" {
     }
   }
 }
+
+
+#tg for grafana
+
+resource "aws_lb_target_group" "grafna_tg" {
+     name = "grafna-tg"
+     port = 3000
+     protocol = "HTTP"
+     vpc_id = var.vpc_id
+     target_type = "ip"
+
+      health_check {
+    path = "/login"
+    interval = 10
+    timeout = 5
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    matcher = "200-399"
+  }
+}
+
+resource "aws_lb_listener_rule" "grafna_listner" {
+  listener_arn = aws_lb_listener.prom_listner.arn
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.grafna_tg.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/grafana*"]
+    }
+  }
+}

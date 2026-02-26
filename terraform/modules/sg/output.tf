@@ -16,3 +16,7 @@ output "prom_sg_id" {
 output "alert_sg_id" {
   value = aws_security_group.alert_sg.id
 }
+
+output "grafna_sg_id" {
+  value = aws_security_group.grafna_sg.id
+}

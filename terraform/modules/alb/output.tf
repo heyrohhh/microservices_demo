@@ -50,3 +50,7 @@ output "alb_prom_arn" {
 output "alb_prom_listner" {
   value = aws_lb_listener.prom_listner.arn
 }
+
+output "grafana_tg_arn" {
+  value = aws_lb_target_group.grafna_tg.arn
+}

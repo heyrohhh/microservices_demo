@@ -22,3 +22,7 @@ variable "prom_sg_id" {
 variable "alert_sg_id" {
    type = string
 }
+
+variable "grafna_sg_id" {
+  type = string
+}

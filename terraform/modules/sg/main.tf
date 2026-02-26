@@ -52,7 +52,6 @@ resource "aws_security_group" "ecs_sg" {
         protocol= "tcp"
     }
 
-    # Allow from ALB on port 3550 (product)
     ingress {
         description = "Allow traffic from ALB on port 3550"
         security_groups = [aws_security_group.alb_sg.id]
@@ -135,4 +134,28 @@ ingress {
         protocol = "-1"
         cidr_blocks  = ["0.0.0.0/0"]
     }
+}
+
+resource "aws_security_group" "grafna_sg" {
+      name = "grafna-sg"
+      vpc_id = var.vpc_id
+      tags = {
+        Name ="grafna-sg"
+      }
+  
+  ingress {
+      description = "allow Traffic from Promotheus"
+      security_groups = [aws_security_group.alb_sg.id]
+      from_port = 3000
+      to_port = 3000
+      protocol = "tcp"
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 }
