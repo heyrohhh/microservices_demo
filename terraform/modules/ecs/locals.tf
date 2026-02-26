@@ -12,5 +12,6 @@ locals {
     shipping = aws_ecs_task_definition.shipping.arn
     shoppingassistant= aws_ecs_task_definition.assitant.arn
     redis = aws_ecs_task_definition.redis.arn
+    currency = aws_ecs_task_definition.currency.arn
   }
 }

@@ -53,7 +53,7 @@ module "ecs" {
   discovery_arns = module.discovery.service_registry_arns
   alb_arn_suffix = module.alb.alb_arn_suffix
   alb_target_group_arn_suffix = module.alb.alb_target_group_arn_suffix
-  alb_target_group_prom_arn = module.alb.alb_target_group_arn
+  alb_target_group_prom_arn = module.alb.alb_target_group_prom_arn
   prom_sg_id = module.sg.prom_sg_id
   services = var.services
   service_arns = module.discovery.service_registry_arns
