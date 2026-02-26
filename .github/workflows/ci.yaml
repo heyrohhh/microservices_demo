@@ -176,7 +176,6 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Tag and Push to ECR
-        if: needs.detect-changes.outputs[matrix.filter] == 'true'
         run: |
          docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
          ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
