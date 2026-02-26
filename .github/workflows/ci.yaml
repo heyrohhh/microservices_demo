@@ -192,14 +192,12 @@ jobs:
           aws ecr create-repository --repository-name ${{ matrix.image }} --region us-east-1
       
       - name: Build image
-        if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
         run: |
            docker build \
            -t ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
            ${{ matrix.context }}
 
       - name: Trivy scan
-        if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
         uses: aquasecurity/trivy-action@0.33.1
         with:
          image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
@@ -211,7 +209,6 @@ jobs:
          trivy-flags: '--skip-version-check' 
 
       - name: Tag and Push to ECR
-        if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
         run: |
           docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
           ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
