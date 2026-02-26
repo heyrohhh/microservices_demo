@@ -266,7 +266,7 @@ jobs:
           -var="recomandation_image=${{ needs.get-registry.outputs.registry }}/recommendationservice:${{ needs.set-version.outputs.version }}" \
           -var="assitant_image=${{ needs.get-registry.outputs.registry }}/shoppingassistant:${{ needs.set-version.outputs.version }}" \
           -var="load_Img=${{ needs.get-registry.outputs.registry }}/loadgenerator:${{ needs.set-version.outputs.version }}" \
-          -var="prometheus=${{ needs.get-registry.outputs.registry }}/prometheus:${{ needs.set-version.outputs.version }}" \
+          -var="prometheus=${{ needs.detect-changes.outputs.prometheus == 'true' && format('%s/prometheus:%s', needs.get-registry.outputs.registry, needs.set-version.outputs.version) || format('%s/prometheus:latest', needs.get-registry.outputs.registry) }}" \
           -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:${{ needs.set-version.outputs.version }}"
 
       - name: Terraform apply
