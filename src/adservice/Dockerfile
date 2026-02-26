@@ -23,6 +23,7 @@ RUN chmod +x gradlew
 RUN ./gradlew downloadRepos
 
 COPY . .
+RUN apk update && apk upgrade --no-cache
 RUN chmod +x gradlew
 RUN ./gradlew installDist
 

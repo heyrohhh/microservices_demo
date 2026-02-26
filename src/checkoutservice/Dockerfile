@@ -19,6 +19,7 @@ WORKDIR /src
 
 # restore dependencies
 COPY go.mod go.sum ./
+RUN apk update && apk upgrade --no-cache
 RUN go mod download
 
 COPY . .
