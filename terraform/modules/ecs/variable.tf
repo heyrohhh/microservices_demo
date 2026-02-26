@@ -105,10 +105,32 @@ variable "service_discovery_namespace" {
 }
 
 
-variable "service_scaling" {
-  type = map(object({
-    min = number
-    max = number
-  }))
+variable "alb_target_group_prom_arn" {
+    type = string 
 }
 
+variable "prom_sg_id" {
+  type = string
+}
+
+variable "services" {
+   type = map(object({
+     desired_count = number
+     min_capacity = number
+     max_capacity = number
+     cpu_target = number
+     mem_target = number
+      }))
+}
+
+variable "service_arns" {
+    type = map(string)
+}
+
+variable "alert_sg_id" {
+  type = string
+}
+
+variable "alarm_tg" {
+  type = string
+}

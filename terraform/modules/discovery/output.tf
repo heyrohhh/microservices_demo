@@ -13,11 +13,10 @@ output "namespace_arn" {
   value       = aws_service_discovery_private_dns_namespace.namespace.arn
 }
 
-output "service_arns" {
-  description = "Map of service names to their registry ARNs"
+output "service_registry_arns" {
   value = {
-    for name, service in aws_service_discovery_service.services : 
-    name => service.arn
+    for k, v in aws_service_discovery_service.services :
+    k => v.arn
   }
 }
 

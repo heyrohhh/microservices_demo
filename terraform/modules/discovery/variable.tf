@@ -7,21 +7,12 @@ variable "vpc_id" {
   type =string
 }
 
-variable "service_names" {
-  type = list(string)
-  default = [
-    "adservice",
-    "cart",
-    "checkout",
-    "currency",
-    "email",
-    "frontend",
-    "loadGenrator",
-    "payment",
-    "product",
-    "recomandation",
-    "redis",
-    "shipping",
-    "shoppingassistant"
-  ]
+variable "services" {
+   type = map(object({
+     desired_count = number
+     min_capacity = number
+     max_capacity = number
+     cpu_target = number
+     mem_target = number
+      }))
 }

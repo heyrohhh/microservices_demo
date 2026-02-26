@@ -1,6 +1,5 @@
 resource "aws_appautoscaling_target" "as_ecs" {
-  depends_on = [aws_ecs_service.ecs_service]
-  for_each = var.service_scaling
+  for_each = var.services
   max_capacity= each.value.max
   min_capacity= each.value.min
   resource_id = "service/${aws_ecs_cluster.ecs_cluster.name}/${each.key}"
@@ -27,7 +26,7 @@ target_tracking_scaling_policy_configuration {
 #for frontend only alb request based scalling
 
 resource "aws_appautoscaling_target" "as_ecs_frontend" {
-  depends_on = [aws_ecs_service.ecs_service]
+  depends_on = [aws_ecs_service.frontend]
   max_capacity= 5
   min_capacity= 1
   resource_id = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.frontend.name}"

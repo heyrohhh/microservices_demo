@@ -12,6 +12,9 @@ module "alb" {
   vpc_id = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   alb_security_group_id = module.sg.alb_security_group_id
+  private_subnet_ids = var.private_subnet_ids
+  prom_sg_id = var.prom_sg_id
+  alert_sg_id = var.alert_sg_id
 }
 
 module "discovery" {
@@ -19,22 +22,7 @@ module "discovery" {
 
   vpc_id = module.vpc.vpc_id
   namespace_name = "local"
-
-  service_names = [
-    "cart",
-    "product",
-    "frontend",
-    "checkout",
-    "payment",
-    "shipping",
-    "email",
-    "currency",
-    "recomandation",
-    "redis",
-    "shoppingassistant",
-    "loadGenrator",
-    "adservice"
-  ]
+  services = var.services
 }
 
 module "ecs" {
@@ -59,10 +47,15 @@ module "ecs" {
   service_discovery_namespace = module.discovery.namespace_name
   cpu  = var.cpu
   memory = var.memory
-  discovery_arns = module.discovery.service_arns
-  service_scaling = var.service_scaling
+  discovery_arns = module.discovery.service_registry_arns
   alb_arn_suffix = var.alb_arn_suffix
   alb_target_group_arn_suffix = var.alb_target_group_arn_suffix
+  alb_target_group_prom_arn = var.alb_target_group_prom_arn
+  prom_sg_id = var.prom_sg_id
+  services = var.services
+  service_arns = module.discovery.service_registry_arns
+  alert_sg_id = var.alert_sg_id
+  alarm_tg = var.alarm_tg
 }
 
 

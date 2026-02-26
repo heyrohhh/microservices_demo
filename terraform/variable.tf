@@ -47,11 +47,19 @@ variable "memory" {
   default = "1024"
 }
 
-variable "service_scaling" {
-  type = map(object({
-    min = number
-    max = number
-  }))
+variable "services" {
+   type = map(object({
+     desired_count = number
+     min_capacity = number
+     max_capacity = number
+     cpu_target = number
+     mem_target = number
+      }))
+}
+
+
+variable "service_arns" {
+    type = map(string)
 }
 
 variable "alb_target_group_arn_suffix" {
@@ -59,5 +67,29 @@ variable "alb_target_group_arn_suffix" {
 }
 
 variable "alb_arn_suffix" {
+  type = string
+}
+
+variable "eprom_sg_id" {
+           type = string
+}
+
+variable "private_subnet_ids" {
+    type = list(string)
+}
+
+variable "alb_target_group_prom_arn" {
+    type = string
+}
+
+variable "prom_sg_id" {
+  type = string
+}
+
+variable "alert_sg_id" {
+  type = string
+}
+
+variable "alarm_tg" {
   type = string
 }

@@ -76,3 +76,63 @@ resource "aws_security_group" "ecs_sg" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
+
+
+resource "aws_security_group" "prom_sg" {
+      name   = "prom-sg"
+    vpc_id = var.vpc_id
+
+    tags = {
+        Name = "prom_sg"
+    }
+
+    ingress {
+        description = "allow prom_sg to communicate with frontend"
+        security_groups = [aws_security_group.alb_sg.id]
+        from_port = 9090
+        to_port = 9090
+        protocol = "tcp"
+    }
+
+    egress {
+        from_port= 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks  = ["0.0.0.0/0"]
+    }
+}
+
+
+#alertmanager security group
+
+resource "aws_security_group" "alert_sg" {
+      name   = "alert-sg"
+    vpc_id = var.vpc_id
+
+    tags = {
+        Name = "alert_sg"
+    }
+
+   ingress {
+  description  = "allow ALB to reach alertmanager"
+  security_groups = [aws_security_group.alb_sg.id]
+  from_port  = 9093
+  to_port  = 9093
+  protocol = "tcp"
+}
+
+ingress {
+  description     = "allow prometheus to push alerts"
+  security_groups = [aws_security_group.prom_sg.id]
+  from_port = 9093
+  to_port   = 9093
+  protocol= "tcp"
+}
+
+    egress {
+        from_port= 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks  = ["0.0.0.0/0"]
+    }
+}

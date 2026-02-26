@@ -27,3 +27,26 @@ output "alb_listener_arn" {
   value= aws_lb_listener.alb_listener.arn
   description = "ALB Listener ARN"
 }
+
+output "alb_target_group_prom_arn" {
+  value = aws_lb_target_group.Prom_tg.arn
+   description = "Target Group ARN for Prometheus"
+}
+
+output "alarm_tg" {
+  value = aws_lb_target_group.alarm_tg
+}
+
+output "alb_prom_id" {
+  value = aws_lb.lb_prom.id
+  description = "Application Load Balancer ID of prom"
+}
+
+output "alb_prom_arn" {
+  value= aws_lb.lb_prom.arn
+  description = "Application Load Balancer ARN"
+}
+
+output "alb_prom_listner" {
+  value = aws_lb_listener.prom_listner.arn
+}

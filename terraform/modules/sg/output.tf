@@ -8,3 +8,11 @@ output "ecs_security_group_id" {
   description = "Security Group ID for ECS tasks"
 }
 
+output "prom_sg_id" {
+   value = aws_security_group.prom_sg.id
+  description = "Security Group ID for prometheus alb"
+}
+
+output "alert_sg_id" {
+  value = aws_security_group.alert_sg.id
+}
