@@ -7,7 +7,7 @@ services = {
     desired_count = 2
   }
 
-  "cart-service" ={
+  "cart" ={
     min_capacity = 1
     max_capacity = 5
     cpu_target = 65

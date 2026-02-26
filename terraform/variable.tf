@@ -62,6 +62,12 @@ variable "services" {
 variable "prometheus" {
   type = string 
 }
+
+output "prometheus_image_debug" {
+  value = var.prometheus
+}
+
+
 variable "alertmanager" {
   type = string
 }
