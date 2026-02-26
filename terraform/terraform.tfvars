@@ -73,6 +73,14 @@ services = {
     desired_count= 1
    }
 
+   "currency" ={
+      min_capacity =1
+    max_capacity =5
+    cpu_target = 65
+    mem_target = 70
+    desired_count= 1
+   }
+
    
     "shoppingassistant" = {
        min_capacity= 1
