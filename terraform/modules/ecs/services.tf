@@ -12,6 +12,18 @@ resource "aws_ecs_service" "services" {
     assign_public_ip = false
   }
 
+
+
+deployment_controller {
+  type = "ECS"
+}
+
+deployment_circuit_breaker {
+  enable   = true
+  rollback = true
+}
+force_new_deployment = true
+
  service_registries {
    registry_arn = var.service_arns[each.key]
 }
