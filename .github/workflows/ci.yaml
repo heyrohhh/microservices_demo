@@ -176,6 +176,16 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Check if image exists in ECR
+        id: image-check
+        run: |
+         aws ecr describe-images \
+         --repository-name ${{ matrix.image }} \
+         --image-ids imageTag=latest \
+         --region us-east-1 > /dev/null 2>&1 && \
+         echo "exists=true" >> $GITHUB_OUTPUT || \
+         echo "exists=false" >> $GITHUB_OUTPUT
+
       - name: Create ECR repository if needed
         run: |
           aws ecr describe-repositories --repository-names ${{ matrix.image }} --region us-east-1 || \
@@ -190,7 +200,7 @@ jobs:
           tags: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
 
       - name: Trivy scan for image vulnerabilities
-        if: matrix.changed == 'true'
+        if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
         uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
@@ -201,7 +211,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Tag and Push to ECR
-        if: matrix.changed == 'true'
+        if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
         run: |
           docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
           ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
