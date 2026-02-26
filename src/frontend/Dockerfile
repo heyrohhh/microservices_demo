@@ -3,7 +3,7 @@ ARG TARGETARCH
 ARG TARGETOS
 WORKDIR /src
 COPY go.mod go.sum ./
-RUN apk update && apk upgrade --no-cache
+
 RUN go mod download
 COPY . .
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -ldflags="-s -w" -o /go/bin/frontend .

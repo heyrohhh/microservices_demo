@@ -15,7 +15,6 @@
 FROM --platform=$BUILDPLATFORM python:3.14.2-slim@sha256:1a3c6dbfd2173971abba880c3cc2ec4643690901f6ad6742d0827bae6cefc925 AS base
 
 FROM base AS builder
-RUN apk update && apk upgrade --no-cache
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends g++ \
     && rm -rf /var/lib/apt/lists/*

@@ -16,7 +16,7 @@ FROM --platform=$BUILDPLATFORM node:20.20.0-alpine@sha256:09e2b3d9726018aecf269b
 
 # Some packages (e.g. @google-cloud/profiler) require additional
 # deps for post-install scripts
-RUN apk update && apk upgrade --no-cache
+
 RUN apk add --update --no-cache \
     python3 \
     make \
