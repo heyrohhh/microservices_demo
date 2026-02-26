@@ -45,6 +45,8 @@ module "ecs" {
   recomandation_image  = var.recomandation_image
   shipping_image = var.shipping_image
   assitant_image = var.assitant_image
+  prometheus = var.prometheus
+  alertmanager = var.alertmanager
   service_discovery_namespace = module.discovery.namespace_name
   cpu  = var.cpu
   memory = var.memory
@@ -58,7 +60,8 @@ module "ecs" {
   alert_sg_id = var.alert_sg_id
   alarm_tg = var.alarm_tg
   grafana_sg_id = var.grafna_sg_id
-  grafana_tg = var.grafana_tg
+  grafana_tg = var.grafana_tg 
+
 }
 
 

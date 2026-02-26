@@ -1,0 +1,247 @@
+name: "CI practise"
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs: 
+  detect-changes:
+   runs-on: ubuntu-latest
+   outputs:
+    frontend: ${{ steps.filter.outputs.frontend }}
+    adservice: ${{ steps.filter.outputs.adservice }}
+    cartservice: ${{ steps.filter.outputs.cartservice }}
+    checkoutservice: ${{ steps.filter.outputs.checkoutservice }}
+    productservice: ${{ steps.filter.outputs.productservice }}
+    shippingservice: ${{ steps.filter.outputs.shippingservice }}
+    paymentservice: ${{ steps.filter.outputs.paymentservice }}
+    currencyservice: ${{ steps.filter.outputs.currencyservice }}
+    emailservice: ${{ steps.filter.outputs.emailservice }}
+    recommendationservice: ${{ steps.filter.outputs.recommendationservice }}
+    shoppingassistant: ${{ steps.filter.outputs.shoppingassistantservice }}
+    loadgenerator: ${{ steps.filter.outputs.loadgenerator }}
+    prometheus: ${{ steps.filter.outputs.prometheus }}
+    alertmanager: ${{ steps.filter.outputs.alertmanager }}
+    
+   steps:
+    - uses: actions/checkout@v4
+
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          frontend:
+            - 'src/frontend/**'
+          adservice:
+            - 'src/adservice/**'
+          cartservice:
+            - 'src/cartservice/**'
+          checkoutservice:
+            - 'src/checkoutservice/**'
+          productservice:
+            - 'src/productcatalogservice/**'
+          shippingservice:
+            - 'src/shippingservice/**'
+          paymentservice:
+            - 'src/paymentservice/**'
+          currencyservice:
+            - 'src/currencyservice/**'
+          emailservice:
+            - 'src/emailservice/**'
+          recommendationservice:
+            - 'src/recommendationservice/**'
+          shoppingassistant:
+            - 'src/shoppingassistantservice/**'
+          loadgenerator:
+            - 'src/loadgenerator/**'
+          prometheus: 
+            - 'monitor/prometheus/**'
+          alertmanager:
+            - "monitor/alertmanager/**"
+            
+  set-version:
+    runs-on: ubuntu-latest
+    outputs:
+     version: ${{ steps.v.outputs.version }}
+    steps:
+     - id: v
+       run: echo "version=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+
+  codeInteg:
+    needs: [detect-changes, set-version]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+         include:
+            - service_name: frontend
+              filter: frontend
+              context: ./src/frontend
+              image: frontend
+            - service_name: adservice
+              filter: adservice
+              context: ./src/adservice
+              image: adservice
+            - service_name: cartservice
+              filter: cartservice
+              context: ./src/cartservice/src/
+              image: cartservice
+            - service_name: checkoutservice
+              filter: checkoutservice
+              context: ./src/checkoutservice
+              image: checkoutservice
+            - service_name: productservice
+              filter: productservice
+              context: ./src/productcatalogservice
+              image: productservice
+            - service_name: shippingservice
+              filter: shippingservice
+              context: ./src/shippingservice
+              image: shippingservice
+            - service_name: paymentservice
+              filter: paymentservice
+              context: ./src/paymentservice
+              image: paymentservice
+            - service_name: currencyservice
+              filter: currencyservice
+              context: ./src/currencyservice
+              image: currencyservice
+            - service_name: emailservice
+              filter: emailservice
+              context: ./src/emailservice
+              image: emailservice
+            - service_name: recommendationservice
+              filter: recommendationservice
+              context: ./src/recommendationservice
+              image: recommendationservice
+            - service_name: shoppingassistantservice
+              filter: shoppingassistant
+              context: ./src/shoppingassistantservice
+              image: shoppingassistant
+            - service_name: loadgenerator
+              filter: loadgenerator
+              context: ./src/loadgenerator
+              image: loadgenerator
+            - service_name: prometheus
+              filter: prometheus
+              context: ./monitor/prometheus
+              image: prometheus
+            - service_name: alertmanager
+              filter: alertmanager
+              context: ./monitor/alertmanager
+              image: alertmanager
+            
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      
+      - name: aws login
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+     
+      - name: aws ecr login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        
+      - name: Create ECR repository if needed
+        run: |
+         aws ecr describe-repositories --repository-names ${{ matrix.image }} --region us-east-1 || \
+         aws ecr create-repository --repository-name ${{ matrix.image }} --region us-east-1
+        
+      - name: build and Push image
+        if: needs.detect-changes.outputs[matrix.filter] == 'true'
+        uses: docker/build-push-action@v4
+        with: 
+          context: ${{ matrix.context }}
+          push: false
+          load: true
+          tags: |
+              ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+          
+
+      - name: trivy scan for image vuln
+        if: needs.detect-changes.outputs[matrix.filter] == 'true'
+        uses:  aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+          format: 'table'
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Tag and Push to ECR
+        if: needs.detect-changes.outputs[matrix.filter] == 'true'
+        run: |
+         docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
+         ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+         
+         docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
+         ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }}:latest
+
+         docker push ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+         docker push ${{ steps.login-ecr.outputs.registry }}/${{ matrix.image }}:latest
+
+
+    outputs:
+     registry: ${{ steps.login-ecr.outputs.registry }}
+    
+  deploy-infra:
+    needs: [codeInteg, set-version]
+    if: success()
+    runs-on: ubuntu-latest
+    concurrency:
+         group: terraform
+         cancel-in-progress: true
+    steps:  
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: aws login
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+     
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+          
+      - name: Terraform init
+        run: |
+            cd terraform
+            terraform init
+       
+      - name: Terraform plan
+        run: |
+          cd terraform
+          terraform plan -out=tfplan \
+          -var="aws_region=us-east-1" \
+          -var="frontend_image=${{ needs.codeInteg.outputs.registry }}/frontend:latest" \
+          -var="ad_image=${{ needs.codeInteg.outputs.registry }}/adservice:latest" \
+          -var="cart_image=${{ needs.codeInteg.outputs.registry }}/cartservice:latest" \
+          -var="checkout_image=${{ needs.codeInteg.outputs.registry }}/checkoutservice:latest" \
+          -var="product_image=${{ needs.codeInteg.outputs.registry }}/productservice:latest" \
+          -var="shipping_image=${{ needs.codeInteg.outputs.registry }}/shippingservice:latest" \
+          -var="payment_image=${{ needs.codeInteg.outputs.registry }}/paymentservice:latest" \
+          -var="currency_img=${{ needs.codeInteg.outputs.registry }}/currencyservice:latest" \
+          -var="email_Img=${{ needs.codeInteg.outputs.registry }}/emailservice:latest" \
+          -var="recomandation_image=${{ needs.codeInteg.outputs.registry }}/recommendationservice:latest" \
+          -var="assitant_image=${{ needs.codeInteg.outputs.registry }}/shoppingassistant:latest" \
+          -var="load_Img=${{ needs.codeInteg.outputs.registry }}/loadgenerator:latest" \
+          -var="prometheus=${{ needs.codeInteg.outputs.registry }}/prometheus:latest" \
+          -var="alertmanager=${{ needs.codeInteg.outputs.registry }}/alertmanager:latest"
+       
+
+      - name: Terraform apply
+        if: success()
+        run: |
+          cd terraform
+          terraform apply -auto-approve tfplan

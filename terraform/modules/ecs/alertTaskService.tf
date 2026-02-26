@@ -20,7 +20,7 @@ resource "aws_ecs_task_definition" "alertmanager" {
    container_definitions = jsonencode([
    {
      name = "alertmanager"
-     image = "heyrohhh/alertmanager"
+     image = var.alertmanager
      essential = true
      portMappings = [
         {

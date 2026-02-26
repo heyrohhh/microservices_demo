@@ -18,7 +18,7 @@ resource "aws_ecs_task_definition" "prometheus" {
      container_definitions = jsonencode([
     {
       name= "prometheus"
-      image= "heyrohhh/prometheus:latest"
+      image= var.prometheus
       essential = true
       portMappings = [
         {

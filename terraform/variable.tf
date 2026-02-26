@@ -100,3 +100,10 @@ variable "grafna_sg_id" {
 variable "grafana_tg" {
   type = string
 }
+
+variable "prometheus" {
+  type = string 
+}
+variable "alertmanager" {
+  type = string
+}

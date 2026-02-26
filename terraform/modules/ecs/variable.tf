@@ -25,6 +25,15 @@ variable "payment_image" {
   type = string
 }
 
+variable "prometheus" {
+  type = string 
+}
+
+variable "alertmanager" {
+  type = string
+}
+
+
 variable "product_image" {
   type = string
 }

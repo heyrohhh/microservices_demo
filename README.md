@@ -1,221 +1,221 @@
-# Microservices Demo on AWS using ECS Fargate, Terraform, and GitHub Actions
+End-to-End Microservices Deployment on AWS using ECS Fargate, Terraform and GitHub Actions
+Overview
 
-This project is a complete end-to-end deployment of a microservices-based application on AWS.  
-It covers containerization, CI, infrastructure provisioning, and automated deployments using real production tooling.
+This project demonstrates a production-style deployment of a microservices-based application on AWS using Infrastructure as Code and a secure CI/CD pipeline.
 
-The goal of this project is to demonstrate **practical DevOps skills**, not toy examples.
+The system includes:
 
----
+Multiple containerized microservices
 
-## Architecture Overview
+AWS ECS Fargate for serverless container orchestration
 
-The application is composed of multiple independent microservices deployed as Docker containers on **AWS ECS Fargate**.  
-A public **Application Load Balancer (ALB)** exposes the frontend, while internal services communicate using **AWS Cloud Map Service Discovery**.  
-Container images are stored in **Amazon ECR**, and the entire infrastructure is provisioned using **Terraform**.  
-CI and image builds are automated using **GitHub Actions**.
+Application Load Balancer with path-based routing
 
----
+AWS Cloud Map for internal service discovery
 
-## High-Level Architecture
+Amazon ECR for container registry
 
-- AWS VPC with public and private subnets
-- Application Load Balancer (public)
-- ECS Cluster (Fargate launch type)
-- ECS Services for each microservice
-- AWS Cloud Map for service discovery
-- Amazon ECR for container images
-- Terraform for Infrastructure as Code
-- GitHub Actions for CI and deployment
+Terraform for infrastructure provisioning
 
----
+GitHub Actions for CI/CD automation
 
-## Microservices List
+Trivy for container vulnerability scanning
 
-| Service Name | Exposure | Description |
-|-------------|---------|-------------|
-| frontend | Public (ALB) | Web UI |
-| cart-service | Internal | Shopping cart |
-| checkout-service | Internal | Checkout processing |
-| payment | Internal | Payment handling |
-| shipping | Internal | Shipping logic |
-| product | Internal | Product catalog |
-| recommendation-service | Internal | Product recommendations |
-| assistant-service | Internal | Shopping assistant |
-| currency-service | Internal | Currency conversion |
-| email-service | Internal | Email notifications |
-| redis-service | Internal | Cache |
-| loadgenerator-service | Internal | Load testing |
+Prometheus for metrics collection
 
----
+Grafana for visualization
 
-## Container Image Strategy
+Alertmanager for alerting via Telegram
 
-- Each service has its own Docker image
-- Images are built and pushed to **Amazon ECR**
-- Image tags use **short Git SHA** for immutability
-- ECS task definitions are updated automatically with new tags
- 
-Example image format:
-{ <account-id>.dkr.ecr.us-east-1.amazonaws.com/frontend:<git-sha> }
----
+The pipeline ensures that only vulnerability-scanned images are deployed.
 
-## CI/CD Pipeline (GitHub Actions)
+Architecture
 
-The pipeline runs automatically on every push to the `main` branch.
+High-level components:
 
-### detect-changes
-- Uses `dorny/paths-filter`
-- Detects which services have changed
-- Prevents unnecessary builds
+GitHub Actions builds and scans Docker images
 
-### set-version
-- Extracts the short Git commit SHA
-- Used as the Docker image tag
+Safe images are pushed to Amazon ECR
 
-### codeInteg
-- Configures AWS credentials
-- Logs in to Amazon ECR
-- Creates ECR repositories if they do not exist
-- Builds and pushes Docker images only for changed services
+Terraform provisions and updates AWS infrastructure
 
-### deploy-infra
-- Initializes Terraform
-- Runs Terraform plan
-- Applies infrastructure changes
-- Updates ECS services with new container images
+ECS Fargate runs services in private subnets
 
-This ensures **zero manual deployment steps**.
+ALB routes traffic to frontend, Prometheus, Grafana, Alertmanager
 
----
+Cloud Map enables internal service-to-service discovery
 
-## Infrastructure as Code (Terraform)
+Prometheus scrapes metrics
 
-Terraform is structured using reusable modules.
+Alertmanager sends alerts
 
-### Modules
+Grafana visualizes metrics
 
-- **vpc**
-  - VPC
-  - Public and private subnets
-  - Internet Gateway
-  - NAT Gateway
+Add your architecture diagram here:
 
-- **sg**
-  - Security groups for ALB and ECS
+![Architecture](docs/img/archiDiag.png)
+Tech Stack
 
-- **alb**
-  - Application Load Balancer
-  - Listener rules
-  - Target groups
+AWS ECS Fargate
 
-- **ecs**
-  - ECS cluster
-  - ECS services
-  - Task definitions
-  - IAM execution role
+Amazon ECR
 
-- **servicediscovery**
-  - AWS Cloud Map namespace
-  - Service registrations
-
-- **ecr**
-  - Amazon ECR repositories
-
----
-
-## Deployment Flow
-
-1. Developer pushes code to `main`
-2. GitHub Actions triggers
-3. Changed services are detected
-4. Docker images are built and pushed to ECR
-5. Terraform updates ECS services
-6. New tasks are deployed automatically
-
-No SSH. No manual steps. No guessing.
-
----
-
-## Prerequisites
-
-- AWS account
-- IAM user with sufficient permissions (Admin for demo)
-- AWS CLI configured locally
-- Terraform installed (v1.6+)
-- GitHub repository with secrets configured
-
-### Required GitHub Secrets
-
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-
----
-
-## How to Deploy
-
-```bash
-git clone <repository-url>
-cd microservices-demo
-git push origin main
-
-That's it Else Everything is automated
-
-____________________________________ Challenges Faced_____________________________
-
-Common Issues and Fixes
-DockerHub Rate Limit Error
-
-Reason: Unauthenticated DockerHub pulls
-Fix: Migrated all images to Amazon ECR
-
-CannotPullContainerError
-
-Reason: Image name mismatch between CI and ECS task definition
-Fix: Standardized service name and image naming across CI and Terraform
-
-GCP Profiler Issue and Resolution
-Problem
-
-While deploying the microservices on AWS ECS, the application logs showed repeated errors related to Google Cloud Profiler. Services were restarting and ECS tasks were unstable.
-
-Investigation
-CloudWatch logs revealed profiler initialization errors such as:
-Failure to load default Google credentials
-Profiler agent unable to start
-This indicated that @google-cloud/profiler was attempting to start in an environment where GCP credentials were not available.
-Root Cause
-Google Cloud Profiler is designed to run only inside GCP environments such as:
-GKE
-Cloud Run
-Compute Engine
-This project is deployed on AWS ECS, where:
-No GCP metadata server exist
-No GCP service account is attached
-No GOOGLE_APPLICATION_CREDENTIALs are configured
-As a result, the profiler continuously failed and affected service stability.
-Fix Applied
-The profiler was explicitly disabled for non-GCP environments.
- { name = "DISABLE_PROFILER", value = "1" }  -> added in Payment Task Defination
-
-Target Group Unhealthy
-Reason: Container port mismatch or app not listening
-Fix: Aligned containerPort, health check path, and ALB target group
-
-Cost Awareness
-This project uses real AWS resources.
-Main cost drivers:
-NAT Gateway
 Application Load Balancer
-ECS Fargate tasks
-Recommendation:
-Destroy infrastructure when not in use
-Avoid leaving NAT Gateways running unnecessarily
+
+AWS Cloud Map
+
+AWS Secrets Manager
+
+Terraform
+
+GitHub Actions
+
+Docker
+
+Trivy
+
+Prometheus
+
+Alertmanager
+
+Grafana
+
+CI/CD Pipeline Flow
+
+On every push to the main branch:
+
+GitHub Actions detects which services changed.
+
+Only changed services are built.
+
+Docker images are built locally.
+
+Trivy scans images for HIGH and CRITICAL vulnerabilities.
+
+If scan passes, images are pushed to Amazon ECR.
+
+Terraform initializes and plans infrastructure changes.
+
+ECS services are updated with new container images.
+
+Security rule enforced:
+
+Build → Scan → Push → Deploy
+
+If vulnerability scan fails, deployment does not proceed.
+
+Infrastructure Design
+Networking
+
+ECS services run in private subnets.
+
+ALB is deployed in public subnets.
+
+Security groups restrict traffic between ALB and ECS services.
+
+Internal services use AWS Cloud Map for DNS-based service discovery.
+
+Container Deployment
+
+Each microservice runs as an independent ECS Fargate service.
+
+Autoscaling is configured based on CPU utilization.
+
+Prometheus and Alertmanager are exposed via ALB path rules.
+
+Grafana is configured with secure admin credentials from Secrets Manager.
+
+Secrets Management
+
+Sensitive values are stored in AWS Secrets Manager:
+
+Telegram bot token
+
+Grafana admin credentials
+
+Secrets are injected into containers via ECS task definitions.
+No secrets are hardcoded in the repository.
+
+Monitoring and Alerting
+Prometheus
+
+Scrapes metrics from services
+
+Tracks CPU and application-level metrics
+
+Grafana
+
+Visualizes service performance
+
+Connected to Prometheus as data source
+
+Alertmanager
+
+Receives alerts from Prometheus
+
+Sends notifications to Telegram
+
+How to Deploy
+Prerequisites
+
+AWS account
+
+IAM user with required permissions
+
+Terraform installed
+
+Docker installed
+
+GitHub repository secrets configured:
+
+AWS_ACCESS_KEY_ID
+
+AWS_SECRET_ACCESS_KEY
+
+Manual Deployment
+git clone <repository-url>
+cd terraform
+terraform init
+terraform plan
+terraform apply
+CI/CD Deployment
+
+Push changes to the main branch.
+Pipeline automatically builds, scans, pushes, and deploys.
+
+Project Structure
+.
+├── src/                      # Microservices source code
+├── monitor/                  # Prometheus and Alertmanager configs
+├── terraform/                # Infrastructure as Code
+├── .github/workflows/        # CI/CD pipeline
+└── README.md
+Security Controls
+
+No hardcoded credentials
+
+Secrets stored in AWS Secrets Manager
+
+Vulnerability scanning before image push
+
+Private networking for ECS tasks
+
+Strict security group rules
+
+Infrastructure managed via Terraform
+
 Future Improvements
+
 Blue/Green deployments
-Canary release
-Autoscaling policies
-Observability with Prometheus and Grafana
-Secrets management using AWS Secrets Manager
 
+Canary releases
 
-This Repo is Manage By **Rohit Neel Mishra**
+OIDC-based GitHub authentication
+
+Automated dashboard provisioning
+
+Service-level Terraform deployments
+
+Author : ROHIT NEEL MISHRA
+
+Microservices infrastructure project demonstrating practical DevOps and cloud engineering implementation.
