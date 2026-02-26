@@ -65,7 +65,7 @@ resource "aws_ecs_service" "prom_service" {
    load_balancer {
     target_group_arn = var.alb_target_group_prom_arn
     container_name = "prometheus"
-    container_port= 9090
+    container_port= 9090 
   }
 
 }
