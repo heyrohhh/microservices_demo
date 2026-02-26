@@ -81,7 +81,7 @@ resource "aws_iam_role_policy" "execution_role_secrets" {
         Action   = ["secretsmanager:GetSecretValue"]
        Resource = [
           "arn:aws:secretsmanager:us-east-1:985017008178:secret:GF_SECURITY_ADMIN_USER-xMu4ly",
-          "arn:aws:secretsmanager:us-east-1:985017008178:secret:GF_SECURITY_ADMIN_PASSWORD-Rwxzvg"
+          "arn:aws:secretsmanager:us-east-1:985017008178:secret:GF_SECURITY_ADMIN_PASSWORD-Rwxzvg",
            "arn:aws:secretsmanager:us-east-1:985017008178:secret:TELEGRAM_BOT_TOKEN-BTvHit"
         ]
       }
