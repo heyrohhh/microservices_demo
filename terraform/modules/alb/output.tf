@@ -34,7 +34,7 @@ output "alb_target_group_prom_arn" {
 }
 
 output "alarm_tg" {
-  value = aws_lb_target_group.alarm_tg
+  value = aws_lb_target_group.alarm_tg.arn
 }
 
 output "grafana_tg" {

@@ -12,10 +12,10 @@ module "alb" {
   vpc_id = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   alb_security_group_id = module.sg.alb_security_group_id
-  private_subnet_ids = var.private_subnet_ids
-  prom_sg_id = var.prom_sg_id
-  alert_sg_id = var.alert_sg_id
-  grafna_sg_id = var.grafna_sg_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  prom_sg_id = module.sg.prom_sg_id
+  alert_sg_id = module.sg.alert_sg_id
+  grafna_sg_id = module.sg.grafna_sg_id
 }
 
 module "discovery" {
@@ -51,16 +51,16 @@ module "ecs" {
   cpu  = var.cpu
   memory = var.memory
   discovery_arns = module.discovery.service_registry_arns
-  alb_arn_suffix = var.alb_arn_suffix
-  alb_target_group_arn_suffix = var.alb_target_group_arn_suffix
-  alb_target_group_prom_arn = var.alb_target_group_prom_arn
-  prom_sg_id = var.prom_sg_id
+  alb_arn_suffix = module.alb.alb_arn_suffix
+  alb_target_group_arn_suffix = module.alb.alb_target_group_arn_suffix
+  alb_target_group_prom_arn = module.alb.alb_target_group_arn
+  prom_sg_id = module.sg.prom_sg_id
   services = var.services
   service_arns = module.discovery.service_registry_arns
-  alert_sg_id = var.alert_sg_id
-  alarm_tg = var.alarm_tg
-  grafana_sg_id = var.grafna_sg_id
-  grafana_tg = var.grafana_tg 
+  alert_sg_id = module.sg.alert_sg_id
+  alarm_tg = module.alb.alarm_tg
+  grafana_sg_id = module.sg.grafna_sg_id
+  grafana_tg = module.alb.grafana_tg
 
 }
 

@@ -78,28 +78,6 @@ variable "private_subnet_ids" {
     type = list(string)
 }
 
-variable "alb_target_group_prom_arn" {
-    type = string
-}
-
-variable "prom_sg_id" {
-  type = string
-}
-
-variable "alert_sg_id" {
-  type = string
-}
-
-variable "alarm_tg" {
-  type = string
-}
-variable "grafna_sg_id" {
-  type = string
-}
-
-variable "grafana_tg" {
-  type = string
-}
 
 variable "prometheus" {
   type = string 
