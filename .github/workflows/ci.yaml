@@ -190,34 +190,36 @@ jobs:
         run: |
           aws ecr describe-repositories --repository-names ${{ matrix.image }} --region us-east-1 || \
           aws ecr create-repository --repository-name ${{ matrix.image }} --region us-east-1
+      
       - name: Build image
-        if: matrix.changed == 'true'
-        uses: docker/build-push-action@v4
-        with:
-          context: ${{ matrix.context }}
-          push: false
-          load: true
-          tags: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+        if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
+        run: |
+           docker build \
+           -t ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
+           ${{ matrix.context }}
 
-      - name: Trivy scan for image vulnerabilities
+      - name: Trivy scan
         if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
-          format: 'table'
-          exit-code: 1
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+         image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+         format: 'table'
+         exit-code: 1
+         ignore-unfixed: true
+         vuln-type: 'os,library'
+         severity: 'CRITICAL,HIGH'
+         trivy-flags: '--skip-version-check' 
 
       - name: Tag and Push to ECR
         if: matrix.changed == 'true' || steps.image-check.outputs.exists == 'false'
         run: |
           docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
           ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
-          docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+
           docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
           ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
+
+          docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
           docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
 
   deploy-infra:
