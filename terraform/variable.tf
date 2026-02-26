@@ -62,22 +62,6 @@ variable "service_arns" {
     type = map(string)
 }
 
-variable "alb_target_group_arn_suffix" {
-    type = string
-}
-
-variable "alb_arn_suffix" {
-  type = string
-}
-
-variable "eprom_sg_id" {
-           type = string
-}
-
-variable "private_subnet_ids" {
-    type = list(string)
-}
-
 
 variable "prometheus" {
   type = string 
