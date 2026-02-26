@@ -38,7 +38,7 @@ output "alarm_tg" {
 }
 
 output "grafana_tg" {
-  value = aws_lb_target_group.grafna_tg
+  value = aws_lb_target_group.grafna_tg.arn
 }
 output "alb_prom_id" {
   value = aws_lb.lb_prom.id
@@ -54,6 +54,3 @@ output "alb_prom_listner" {
   value = aws_lb_listener.prom_listner.arn
 }
 
-output "grafana_tg_arn" {
-  value = aws_lb_target_group.grafna_tg.arn
-}

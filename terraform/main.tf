@@ -23,7 +23,7 @@ module "discovery" {
 
   vpc_id = module.vpc.vpc_id
   namespace_name = "local"
-  services = keys(var.services)
+  services = var.services
 }
 
 module "ecs" {
@@ -55,7 +55,7 @@ module "ecs" {
   alb_target_group_arn_suffix = module.alb.alb_target_group_arn_suffix
   alb_target_group_prom_arn = module.alb.alb_target_group_arn
   prom_sg_id = module.sg.prom_sg_id
-  services = key(var.services)
+  services = var.services
   service_arns = module.discovery.service_registry_arns
   alert_sg_id = module.sg.alert_sg_id
   alarm_tg = module.alb.alarm_tg

@@ -8,5 +8,11 @@ variable "vpc_id" {
 }
 
 variable "services" {
-  type = list(string)
+  type = map(object({
+    desired_count = number
+    min_capacity  = number
+    max_capacity  = number
+    cpu_target    = number
+    mem_target    = number
+  }))
 }

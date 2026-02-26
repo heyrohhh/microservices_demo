@@ -68,7 +68,4 @@ resource "aws_ecs_service" "prom_service" {
     container_port= 9090
   }
 
-  service_registries {
-    registry_arn =var.discovery_arns["prometheus"]
-  }
 }
