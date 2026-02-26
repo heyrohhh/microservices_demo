@@ -65,11 +65,12 @@ container_definitions = jsonencode([
 
 resource "aws_ecs_service" "grafana_service" {
       name = "grafana-service"
+     
       cluster = aws_ecs_cluster.ecs_cluster.id
       task_definition = aws_ecs_task_definition.garfana.arn
       desired_count = 1
       launch_type = "FARGATE"
-
+      depends_on = [var.alb_listener_arn]
       network_configuration {
            subnets = var.private_subnet_ids
            security_groups = [var.grafana_sg_id]

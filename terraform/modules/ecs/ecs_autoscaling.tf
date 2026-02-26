@@ -1,5 +1,6 @@
 resource "aws_appautoscaling_target" "as_ecs" {
   for_each = var.services
+  depends_on = [aws_ecs_service.services]
   max_capacity= each.value.max_capacity
   min_capacity= each.value.min_capacity
   resource_id = "service/${aws_ecs_cluster.ecs_cluster.name}/${each.key}"

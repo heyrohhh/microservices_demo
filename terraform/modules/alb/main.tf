@@ -157,7 +157,7 @@ resource "aws_lb_target_group" "grafna_tg" {
 
 resource "aws_lb_listener_rule" "grafna_listner" {
   listener_arn = aws_lb_listener.prom_listner.arn
-  priority     = 10
+  priority     = 20
 
   action {
     type             = "forward"
