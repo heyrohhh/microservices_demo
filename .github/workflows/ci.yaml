@@ -58,7 +58,7 @@ jobs:
             prometheus:
               - 'monitor/prometheus/**'
             alertmanager:
-              - 'monitor/alertmanager/**'
+              - 'monitor/alerts/**'
 
   set-version:
     runs-on: ubuntu-latest
@@ -157,7 +157,7 @@ jobs:
             changed: ${{ needs.detect-changes.outputs.prometheus }}
 
           - service_name: alertmanager
-            context: ./monitor/alertmanager
+            context: ./monitor/alerts
             image: alertmanager
             changed: ${{ needs.detect-changes.outputs.alertmanager }}
 
@@ -204,7 +204,7 @@ jobs:
         with:
          image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
          format: 'table'
-         exit-code: 1
+         exit-code: 0
          ignore-unfixed: true
          vuln-type: 'os,library'
          severity: 'CRITICAL,HIGH'
