@@ -67,9 +67,6 @@ variable "network_mode" {
    default = "awsvpc"
 }
 
-
-
-
 variable "compatibilities" {
      type = set(string)
      default =[ "FARGATE"]

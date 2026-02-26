@@ -23,7 +23,7 @@ module "discovery" {
 
   vpc_id = module.vpc.vpc_id
   namespace_name = "local"
-  services = var.services
+  services = keys(var.services)
 }
 
 module "ecs" {
