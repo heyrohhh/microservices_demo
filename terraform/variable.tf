@@ -58,10 +58,6 @@ variable "services" {
 }
 
 
-variable "service_arns" {
-    type = map(string)
-}
-
 
 variable "prometheus" {
   type = string 

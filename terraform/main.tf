@@ -61,7 +61,6 @@ module "ecs" {
   alarm_tg = module.alb.alarm_tg
   grafana_sg_id = module.sg.grafna_sg_id
   grafana_tg = module.alb.grafana_tg
-
 }
 
 
