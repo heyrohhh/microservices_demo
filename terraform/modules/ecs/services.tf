@@ -12,8 +12,6 @@ resource "aws_ecs_service" "services" {
     assign_public_ip = false
   }
 
-
-
 deployment_controller {
   type = "ECS"
 }
