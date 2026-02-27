@@ -248,7 +248,7 @@ jobs:
 
       - name: Terraform plan
         run: |
-          cd terraform 
+          cd terraform  
           terraform plan -out=tfplan \
           -var-file="terraform.tfvars" \
           -var="aws_region=us-east-1" \
