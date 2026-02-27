@@ -251,7 +251,7 @@ jobs:
       - name: Terraform plan
         working-directory: terraform
         run: |  
-          terraform plan -out=tfplan \ 
+          terraform plan -out=tfplan \
           -var="aws_region=us-east-1" \
           -var="frontend_image=${{ needs.get-registry.outputs.registry }}/frontend:${{ needs.set-version.outputs.version }}" \
           -var="ad_image=${{ needs.get-registry.outputs.registry }}/adservice:${{ needs.set-version.outputs.version }}" \
