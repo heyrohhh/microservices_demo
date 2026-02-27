@@ -5,6 +5,7 @@ module "vpc" {
 module "sg" {
   source = "./modules/sg"
   vpc_id = module.vpc.vpc_id
+  bastion_sg_id = module.ssm_bastion.bastion_sg_id
 }
 
 module "alb" {
