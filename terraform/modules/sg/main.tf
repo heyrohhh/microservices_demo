@@ -83,6 +83,13 @@ resource "aws_security_group" "ecs_sg" {
         protocol= "tcp"
     }
 
+ingress {
+  description     = "Redis exporter to Redis"
+  from_port       = 6379
+  to_port         = 6379
+  protocol        = "tcp"
+  self            = true
+}
     # Allow from ALB on port 7070 (cart)
     ingress {
         description= "Allow traffic from ALB on port 7070"

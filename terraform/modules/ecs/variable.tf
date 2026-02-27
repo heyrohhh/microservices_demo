@@ -106,7 +106,7 @@ variable "aws_region" {
 variable "service_discovery_namespace" {
   description = "Service discovery namespace"
   type        = string
-  default     = "local"  # or whatever your namespace is
+  default     = "local" 
 }
 
 
@@ -131,6 +131,22 @@ variable "services" {
 variable "service_arns" {
     type = map(string)
 }
+
+variable "monitor_service_arns" {
+   type = map(string)
+}
+
+variable "monitorneeds" {
+  type = map(string)
+  default = { 
+    alertmanager ="alertmanager"
+   redis-exporter ="redis-exporter", 
+   frontend="frontend", 
+   prometheus="prometheus"
+   }
+}
+
+
 
 variable "alert_sg_id" {
   type = string

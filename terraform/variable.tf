@@ -57,6 +57,17 @@ variable "services" {
   }))
 }
 
+variable "monitorneeds" {
+  type = map(string)
+  default = { 
+    alertmanager ="alertmanager"
+   redis-exporter ="redis-exporter", 
+   frontend="frontend", 
+   prometheus="prometheus"
+   }
+}
+
+
 
 
 variable "prometheus" {

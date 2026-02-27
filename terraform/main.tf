@@ -61,7 +61,8 @@ module "ecs" {
   alert_sg_id = module.sg.alert_sg_id
   alarm_tg = module.alb.alarm_tg
   grafana_sg_id = module.sg.grafna_sg_id
-  grafana_tg = module.alb.grafana_tg
+  grafana_tg = module.alb.grafana_tg 
+  monitor_service_arns = module.discovery.monitor_service_arns
 }
 
 module "ssm_bastion" {

@@ -16,3 +16,13 @@ variable "services" {
     mem_target    = number
   }))
 }
+
+variable "monitorneeds" {
+  type = map(string)
+  default = { 
+    alertmanager ="alertmanager"
+   redis-exporter ="redis-exporter", 
+   frontend="frontend", 
+   prometheus="prometheus"
+   }
+}

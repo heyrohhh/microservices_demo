@@ -18,4 +18,8 @@ resource "aws_ecs_service" "frontend" {
   }
 
   depends_on =[var.alb_listener_arn]
+
+  service_registries {
+    registry_arn = var.monitor_service_arns["frontend"]
+  }
 }

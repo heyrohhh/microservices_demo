@@ -68,4 +68,7 @@ resource "aws_ecs_service" "prom_service" {
     container_port= 9090 
   }
 
+  service_registries {
+     registry_arn = var.monitor_service_arns["prometheus"]
+  }
 }

@@ -20,6 +20,13 @@ output "service_registry_arns" {
   }
 }
 
+output "monitor_service_arns" {
+  value = {
+    for m, a in aws_service_discovery_service.monitor_services :
+    m => a.arn
+}
+}
+
 output "service_ids" {
   description = "Map of service names to their IDs"
   value = {

@@ -51,7 +51,7 @@ resource "aws_ecs_task_definition" "alertmanager" {
 
 
 resource "aws_ecs_service" "am_service" {
-        name = "ecs-alert-service"
+        name = "alertmanager"
         cluster = aws_ecs_cluster.ecs_cluster.id
         task_definition = aws_ecs_task_definition.alertmanager.arn
         desired_count = 1
@@ -67,5 +67,9 @@ resource "aws_ecs_service" "am_service" {
   target_group_arn = var.alarm_tg
   container_name   = "alertmanager"
   container_port   = 9093
+}
+
+service_registries {
+     registry_arn = var.monitor_service_arns["alertmanager"]
 }
 }
