@@ -18,7 +18,7 @@ resource "aws_lb_target_group" "alb_tg" {
   }
 }
 
-
+ 
 # load Balancer
 
 resource "aws_lb" "alb_lb" {
