@@ -115,7 +115,7 @@ ingress {
         security_groups  = ["0.0.0.0/0"]
     }
 }
-
+ 
 
 #alertmanager security group
 
@@ -135,13 +135,6 @@ resource "aws_security_group" "alert_sg" {
   protocol = "tcp"
 }
 
-ingress {
-  description     = "allow prometheus to push alerts"
-  security_groups = [aws_security_group.prom_sg.id]
-  from_port = 9093
-  to_port   = 9093
-  protocol= "tcp"
-}
 
     egress {
         from_port= 0
