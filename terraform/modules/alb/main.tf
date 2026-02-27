@@ -88,7 +88,7 @@ resource "aws_lb" "lb_prom" {
 
 resource "aws_lb_listener" "prom_listner" {
   load_balancer_arn = aws_lb.lb_prom.arn
-  port = 80
+  port = 9090
   protocol = "HTTP"
   default_action {
     type             = "forward"

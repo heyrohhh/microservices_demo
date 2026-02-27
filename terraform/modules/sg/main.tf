@@ -93,11 +93,26 @@ resource "aws_security_group" "prom_sg" {
         protocol = "tcp"
     }
 
+ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks =[aws_security_group.alb_sg.id]
+  }
+
+  ingress {
+    from_port   = 9093
+    to_port     = 9093
+    protocol    = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+
     egress {
         from_port= 0
         to_port = 0
         protocol = "-1"
-        cidr_blocks  = ["0.0.0.0/0"]
+        security_groups  = ["0.0.0.0/0"]
     }
 }
 
