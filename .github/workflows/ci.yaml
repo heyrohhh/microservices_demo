@@ -200,14 +200,14 @@ jobs:
       - name: Trivy scan
         uses: aquasecurity/trivy-action@0.33.1 
         with:
-         version: latest
+         version: 0.69
          image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
          format: 'table'
          exit-code: 0
          ignore-unfixed: true
          vuln-type: 'os,library'
          severity: 'CRITICAL,HIGH'
-         trivy-flags: '--skip-version-check  --skip-db-update' 
+         trivy-flags: '--skip-version-check' 
 
       - name: Tag and Push to ECR
         run: |
