@@ -15,7 +15,7 @@ services = {
     desired_count = 2
   }
 
-  "checkout-service" = {
+  "checkout" = {
     min_capacity = 1
     max_capacity = 4
     cpu_target = 70

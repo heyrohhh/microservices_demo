@@ -2,7 +2,7 @@ locals {
   task_definitions = {
     adtask-service =aws_ecs_task_definition.adtask.arn
     cart= aws_ecs_task_definition.cart.arn
-    checkout-service = aws_ecs_task_definition.checkout.arn
+    checkout= aws_ecs_task_definition.checkout.arn
     currency-service= aws_ecs_task_definition.currency.arn
     email-service = aws_ecs_task_definition.email.arn
     loadgenrator-service   = aws_ecs_task_definition.loadgenrator.arn
