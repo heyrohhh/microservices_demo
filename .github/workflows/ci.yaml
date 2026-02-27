@@ -209,7 +209,7 @@ jobs:
          severity: 'CRITICAL,HIGH'
          trivy-flags: '--skip-version-check' 
 
-      - name: Tag and Push to ECR
+      - name: Tag and Push to ECR 
         run: |
           docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
           ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
