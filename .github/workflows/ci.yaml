@@ -244,14 +244,13 @@ jobs:
           terraform_version: 1.6.6
 
       - name: Terraform init
+        working-directory: terraform
         run: |
-             cd terraform
              terraform init --upgrade
 
       - name: Terraform plan
         working-directory: terraform
-        run: |
-          cd terraform   
+        run: |  
           terraform plan -out=tfplan \ 
           -var="aws_region=us-east-1" \
           -var="frontend_image=${{ needs.get-registry.outputs.registry }}/frontend:${{ needs.set-version.outputs.version }}" \
