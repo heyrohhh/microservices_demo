@@ -246,12 +246,12 @@ jobs:
       - name: Terraform init
         working-directory: terraform
         run: |
-             terraform init --upgrade
+             terraform init -reconfigure
 
       - name: Terraform plan
         working-directory: terraform
         run: |  
-          terraform plan -out=tfplan \
+          terraform plan -out=tf2plan \
           -var="aws_region=us-east-1" \
           -var="frontend_image=${{ needs.get-registry.outputs.registry }}/frontend:${{ needs.set-version.outputs.version }}" \
           -var="ad_image=${{ needs.get-registry.outputs.registry }}/adservice:${{ needs.set-version.outputs.version }}" \
@@ -269,4 +269,4 @@ jobs:
           -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:${{ needs.set-version.outputs.version }}"
 
       - name: Terraform apply
-        run: cd terraform && terraform apply -auto-approve tfplan
+        run: cd terraform && terraform apply -auto-approve tf2plan
