@@ -268,5 +268,5 @@ jobs:
           -var="prometheus=${{ needs.get-registry.outputs.registry }}/prometheus:${{ needs.set-version.outputs.version }}" \
           -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:${{ needs.set-version.outputs.version }}"
 
-      - name: Terraform apply 
+      - name: Terraform apply
         run: cd terraform && terraform apply -auto-approve tf2plan
