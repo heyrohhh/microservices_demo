@@ -200,7 +200,7 @@ jobs:
       - name: Trivy scan
         uses: aquasecurity/trivy-action@0.33.1 
         with:
-         version: 0.69.0 
+         version: 'v0.69.1' 
          image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
          format: 'table'
          exit-code: 0
