@@ -24,6 +24,46 @@ resource "aws_security_group" "alb_sg" {
 }
 
 
+
+
+
+resource "aws_security_group" "prom_alb_sg" {
+  name   = "prom-alb-sg"
+  vpc_id = var.vpc_id
+  tags = { Name = "prom_alb_sg" }
+
+  ingress {
+    description     = "EC2 Bastion se Prometheus UI"
+    from_port       = 9090
+    to_port         = 9090
+    protocol        = "tcp"
+    security_groups = [var.bastion_sg_id]
+  }
+
+  ingress {
+    description     = "EC2 Bastion se Grafana UI"
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [var.bastion_sg_id]
+  }
+
+  ingress {
+    description     = "EC2 Bastion se Alertmanager UI"
+    from_port       = 9093
+    to_port         = 9093
+    protocol        = "tcp"
+    security_groups = [var.bastion_sg_id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 #ecs Security group
 
 resource "aws_security_group" "ecs_sg" {
@@ -60,6 +100,14 @@ resource "aws_security_group" "ecs_sg" {
         protocol = "tcp"
     }
 
+     ingress {
+    description     = "Prometheus scraping"
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    security_groups = [aws_security_group.prom_sg.id]
+     }  
+
     ingress {
         description = "Allow ECS tasks to communicate with each other"
         self = true
@@ -85,26 +133,34 @@ resource "aws_security_group" "prom_sg" {
         Name = "prom_sg"
     }
 
-    ingress {
-        description = "allow prom_sg to communicate with frontend"
-        security_groups = [aws_security_group.alb_sg.id]
-        from_port = 9090
-        to_port = 9090
-        protocol = "tcp"
-    }
+  ingress {
+    description     = "Prometheus UI from private ALB"
+    from_port       = 9090
+    to_port         = 9090
+    protocol        = "tcp"
+    security_groups = [aws_security_group.prom_alb_sg.id]
+  }
 
 ingress {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks =[aws_security_group.alb_sg.id]
+    security_groups =[aws_security_group.prom_alb_sg.id]
   }
 
   ingress {
     from_port   = 9093
     to_port     = 9093
     protocol    = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    security_groups = [aws_security_group.prom_alb_sg.id]
+  }
+
+  ingress {
+    description     = "EC2 SSM Bastion access"
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [var.bastion_sg_id]
   }
 
 
@@ -112,7 +168,7 @@ ingress {
         from_port= 0
         to_port = 0
         protocol = "-1"
-        security_groups  = ["0.0.0.0/0"]
+        cidr_blocks  = ["0.0.0.0/0"]
     }
 }
  
@@ -129,11 +185,19 @@ resource "aws_security_group" "alert_sg" {
 
    ingress {
   description  = "allow ALB to reach alertmanager"
-  security_groups = [aws_security_group.alb_sg.id]
+  security_groups = [aws_security_group.prom_alb_sg.id]
   from_port  = 9093
   to_port  = 9093
   protocol = "tcp"
 }
+
+ ingress {
+    description     = "Prometheus se alerts"
+    from_port       = 9093
+    to_port         = 9093
+    protocol        = "tcp"
+    security_groups = [aws_security_group.prom_sg.id]
+  }
 
 
     egress {
@@ -153,7 +217,7 @@ resource "aws_security_group" "grafna_sg" {
   
   ingress {
       description = "allow Traffic from Promotheus"
-      security_groups = [aws_security_group.alb_sg.id]
+      security_groups = [aws_security_group.prom_alb_sg.id]
       from_port = 3000
       to_port = 3000
       protocol = "tcp"
