@@ -63,4 +63,10 @@ module "ecs" {
   grafana_tg = module.alb.grafana_tg
 }
 
+module "ssm_bastion" {
+  source= "./modules/ec2"
+  vpc_id= module.vpc.vpc_id  
+  private_subnet_ids = module.vpc.private_subnet_ids
+}
+
 
