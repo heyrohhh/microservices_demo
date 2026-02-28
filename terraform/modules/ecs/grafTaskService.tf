@@ -10,7 +10,7 @@ resource "aws_cloudwatch_log_group" "ecs_grafana" {
 
 resource "aws_ecs_task_definition" "garfana" {
   depends_on = [ aws_cloudwatch_log_group.ecs_grafana ]
-  family = "Grafana-clean"
+  family = "Grafana-clean-1"
   cpu = var.cpu
   memory = var.memory
   requires_compatibilities = var.compatibilities
@@ -57,8 +57,7 @@ container_definitions = jsonencode([
 #service 
 
 resource "aws_ecs_service" "grafana_service" {
-      name = "grafana-clean-service"
-     
+      name = "grafana-clean-service-1"
       cluster = aws_ecs_cluster.ecs_cluster.id
       task_definition = aws_ecs_task_definition.garfana.arn
       desired_count = 1
