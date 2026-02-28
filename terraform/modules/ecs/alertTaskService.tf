@@ -23,11 +23,6 @@ resource "aws_ecs_task_definition" "alertmanager" {
      image = var.alertmanager
      essential = true
 
- command = [
-      "--web.route-prefix=/alertmanager",
-      "--web.external-url=http://lb-prom:9090/alertmanager"
-    ]
-
      portMappings = [
         {
             containerPort = 9093

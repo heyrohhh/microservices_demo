@@ -28,18 +28,6 @@ container_definitions = jsonencode([
             }
         ]
 
-     
- environment=[
-  {
-    name  = "GF_SERVER_ROOT_URL"
-    value = "%(protocol)s://%(domain)s/grafana/"
-  },
-  {
-    name  = "GF_SERVER_SERVE_FROM_SUB_PATH"
-    value = "true"
-  }
-]
-
      secrets = [
           {
           name      = "GF_SECURITY_ADMIN_USER"

@@ -86,7 +86,6 @@ resource "aws_lb_target_group" "Prom_tg" {
 
 
 
-
 resource "aws_lb_listener" "prom_listner" {
   load_balancer_arn = aws_lb.lb_prom.arn
   port = 9090
@@ -120,19 +119,14 @@ resource "aws_lb_target_group" "alarm_tg" {
 
 
 
-resource "aws_lb_listener_rule" "alert_rule" {
-  listener_arn = aws_lb_listener.prom_listner.arn
-  priority     = 10
+resource "aws_lb_listener" "alertmanager" {
+  load_balancer_arn = aws_lb.lb_prom.arn
+  port              = 9093
+  protocol          = "HTTP"
 
-  action {
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alarm_tg.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/alertmanager*"]
-    }
   }
 }
 
@@ -156,18 +150,13 @@ resource "aws_lb_target_group" "grafna_tg" {
   }
 }
 
-resource "aws_lb_listener_rule" "grafna_listner" {
-  listener_arn = aws_lb_listener.prom_listner.arn
-  priority     = 20
+resource "aws_lb_listener" "grafana" {
+  load_balancer_arn = aws_lb.lb_prom.arn
+  port              = 3000
+  protocol          = "HTTP"
 
-  action {
+  default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.grafna_tg.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/grafana*"]
-    }
+    target_group_arn = aws_lb_target_group.grafana_tg.arn
   }
 }
