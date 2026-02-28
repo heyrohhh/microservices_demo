@@ -243,10 +243,10 @@ jobs:
         with:
           terraform_version: 1.6.6
 
-      # - name: Terraform init
-      #   working-directory: terraform
-      #   run: |
-      #        terraform init -reconfigure
+      - name: Terraform init
+        working-directory: terraform
+        run: |
+             terraform init -reconfigure
 
       # - name: Terraform plan
       #   working-directory: terraform
