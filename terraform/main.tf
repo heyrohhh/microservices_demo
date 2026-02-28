@@ -14,9 +14,9 @@ module "alb" {
   public_subnet_ids = module.vpc.public_subnet_ids
   alb_security_group_id = module.sg.alb_security_group_id
   private_subnet_ids = module.vpc.private_subnet_ids
-  prom_sg_id = module.sg.prom_sg_id
   alert_sg_id = module.sg.alert_sg_id
   grafna_sg_id = module.sg.grafna_sg_id
+  prom_alb_sg_id = module.sg.prom_alb_sg_id
 }
 
 module "discovery" {

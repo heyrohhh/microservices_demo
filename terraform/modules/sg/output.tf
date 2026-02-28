@@ -13,6 +13,10 @@ output "prom_sg_id" {
   description = "Security Group ID for prometheus alb"
 }
 
+output "prom_alb_sg_id" {
+  value = aws_security_group.prom_alb_sg.id
+}
+
 output "alert_sg_id" {
   value = aws_security_group.alert_sg.id
 }

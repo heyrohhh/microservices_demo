@@ -74,7 +74,7 @@ resource "aws_lb" "lb_prom" {
       name = "lb-prom"
       internal = true
       load_balancer_type = "application"
-      security_groups = [var.prom_sg_id]
+      security_groups = [var.prom_alb_sg_id]
       subnets = var.private_subnet_ids
       enable_deletion_protection = false
       
