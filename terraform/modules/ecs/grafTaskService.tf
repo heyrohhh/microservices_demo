@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "ecs_grafana" {
-  name = "/etc/grafana"
+  name = "/ecs/grafana"
   retention_in_days = 1
 
   tags = {
@@ -28,10 +28,11 @@ container_definitions = jsonencode([
             }
         ]
 
-      environment = [
+     
+ environment=[
   {
     name  = "GF_SERVER_ROOT_URL"
-    value = "http://lb-prom:9090/grafana"
+    value = "%(protocol)s://%(domain)s/grafana/"
   },
   {
     name  = "GF_SERVER_SERVE_FROM_SUB_PATH"
