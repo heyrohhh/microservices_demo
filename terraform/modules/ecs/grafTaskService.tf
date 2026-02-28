@@ -28,10 +28,14 @@ container_definitions = jsonencode([
             }
         ]
 
-       environment = [
-      {
+      environment = [
+  {
     name  = "GF_SERVER_ROOT_URL"
-    value = "%(protocol)s://%(domain)s/grafana/"
+    value = "http://lb-prom:9090/grafana"
+  },
+  {
+    name  = "GF_SERVER_SERVE_FROM_SUB_PATH"
+    value = "true"
   }
 ]
 

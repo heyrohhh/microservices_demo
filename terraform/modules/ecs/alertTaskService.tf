@@ -22,6 +22,12 @@ resource "aws_ecs_task_definition" "alertmanager" {
      name = "alertmanager"
      image = var.alertmanager
      essential = true
+
+ command = [
+      "--web.route-prefix=/alertmanager",
+      "--web.external-url=http://lb-prom:9090/alertmanager"
+    ]
+
      portMappings = [
         {
             containerPort = 9093
@@ -54,7 +60,7 @@ resource "aws_ecs_service" "am_service" {
         name = "alertmanager"
         cluster = aws_ecs_cluster.ecs_cluster.id
         task_definition = aws_ecs_task_definition.alertmanager.arn
-        desired_count = 0
+        desired_count = 1
         launch_type = "FARGATE"
 
         network_configuration {
