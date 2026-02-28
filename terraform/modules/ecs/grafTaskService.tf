@@ -10,7 +10,7 @@ resource "aws_cloudwatch_log_group" "ecs_grafana" {
 
 resource "aws_ecs_task_definition" "garfana" {
   depends_on = [ aws_cloudwatch_log_group.ecs_grafana ]
-  family = "Grafana"
+  family = "Grafana-clean"
   cpu = var.cpu
   memory = var.memory
   requires_compatibilities = var.compatibilities
