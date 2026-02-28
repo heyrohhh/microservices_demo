@@ -268,9 +268,9 @@ jobs:
       #     -var="prometheus=${{ needs.get-registry.outputs.registry }}/prometheus:${{ needs.set-version.outputs.version }}" \
       #     -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:${{ needs.set-version.outputs.version }}"
 
-      - name: Terraform apply
+      - name: Terraform destroy
         run: |
-            cd terraform \
+            cd terraform
             terraform destroy -auto-approve \
-            -var="aws_region=us-east-1" \
-            -var-file="terraform.tfvars"
+               -var="aws_region=us-east-1" \
+               -var-file="terraform.tfvars"
