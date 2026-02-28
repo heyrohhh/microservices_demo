@@ -57,7 +57,7 @@ container_definitions = jsonencode([
 #service 
 
 resource "aws_ecs_service" "grafana_service" {
-      name = "grafana-service"
+      name = "grafana-clean-service"
      
       cluster = aws_ecs_cluster.ecs_cluster.id
       task_definition = aws_ecs_task_definition.garfana.arn
