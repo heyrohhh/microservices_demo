@@ -119,21 +119,21 @@ resource "aws_lb_target_group" "alarm_tg" {
 
 
 
-resource "aws_lb_listener_rule" "alert_rule" {
-  listener_arn = aws_lb_listener.prom_listner.arn
-  priority     = 10
+# resource "aws_lb_listener_rule" "alert_rule" {
+#   listener_arn = aws_lb_listener.prom_listner.arn
+#   priority     = 10
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.alarm_tg.arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.alarm_tg.arn
+#   }
 
-  condition {
-    path_pattern {
-      values = ["/alertmanager*"]
-    }
-  }
-}
+#   condition {
+#     path_pattern {
+#       values = ["/alertmanager*"]
+#     }
+#   }
+# }
 
 
 #tg for grafana
@@ -155,18 +155,18 @@ resource "aws_lb_target_group" "grafna_tg" {
   }
 }
 
-resource "aws_lb_listener_rule" "grafna_listner" {
-  listener_arn = aws_lb_listener.prom_listner.arn
-  priority     = 20
+# resource "aws_lb_listener_rule" "grafna_listner" {
+#   listener_arn = aws_lb_listener.prom_listner.arn
+#   priority     = 20
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.grafna_tg.arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.grafna_tg.arn
+#   }
 
-  condition {
-    path_pattern {
-      values = ["/grafana*"]
-    }
-  }
-}
+#   condition {
+#     path_pattern {
+#       values = ["/grafana*"]
+#     }
+#   }
+# }
