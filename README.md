@@ -1,7 +1,11 @@
 End-to-End Microservices Deployment on AWS using ECS Fargate, Terraform and GitHub Actions
 Overview
 
-This project demonstrates a production-style deployment of a microservices-based application on AWS using Infrastructure as Code and a secure CI/CD pipeline.
+This project demonstrates an end-to-end deployment of a microservices-based application on AWS using Infrastructure as Code, container security scanning, and a cloud-native monitoring stack.
+
+The focus of this project is to showcase real-world DevOps practices such as private networking, service discovery, CI/CD automation, observability, and secure secret management using AWS-native services.
+
+System Components
 
 The system includes:
 
@@ -13,7 +17,7 @@ Application Load Balancer with path-based routing
 
 AWS Cloud Map for internal service discovery
 
-Amazon ECR for container registry
+Amazon ECR for container image registry
 
 Terraform for infrastructure provisioning
 
@@ -23,44 +27,46 @@ Trivy for container vulnerability scanning
 
 Prometheus for metrics collection
 
-Grafana for visualization
+Alertmanager for alerting (Telegram integration)
 
-Alertmanager for alerting via Telegram
-
-The pipeline ensures that only vulnerability-scanned images are deployed.
+Grafana for metrics visualization (stateless)
 
 Architecture
+High-Level Flow
 
-High-level components:
+GitHub Actions builds Docker images
 
-GitHub Actions builds and scans Docker images
+Trivy scans images for HIGH and CRITICAL vulnerabilities
 
-Safe images are pushed to Amazon ECR
+Clean images are pushed to Amazon ECR
 
 Terraform provisions and updates AWS infrastructure
 
-ECS Fargate runs services in private subnets
+ECS Fargate runs microservices in private subnets
 
-ALB routes traffic to frontend, Prometheus, Grafana, Alertmanager
+Public ALB serves frontend traffic
 
-Cloud Map enables internal service-to-service discovery
+Private ALB serves monitoring components
 
-Prometheus scrapes metrics
+AWS Cloud Map enables DNS-based service discovery
 
-Alertmanager sends alerts
+Prometheus scrapes metrics from ECS services
+
+Alertmanager sends alerts to Telegram
 
 Grafana visualizes metrics
 
-Add your architecture diagram here:
+Architecture Diagram
 
-![Architecture](docs/img/archiDiag.png)
+![Architecture Diagram](docs/img/archiDiagram.png)
+
 Tech Stack
 
 AWS ECS Fargate
 
 Amazon ECR
 
-Application Load Balancer
+Application Load Balancer (Public & Private)
 
 AWS Cloud Map
 
@@ -84,78 +90,97 @@ CI/CD Pipeline Flow
 
 On every push to the main branch:
 
-GitHub Actions detects which services changed.
+GitHub Actions detects modified services
 
-Only changed services are built.
+Only changed services are built
 
-Docker images are built locally.
+Docker images are built
 
-Trivy scans images for HIGH and CRITICAL vulnerabilities.
+Trivy scans images for HIGH and CRITICAL vulnerabilities
 
-If scan passes, images are pushed to Amazon ECR.
+If scan passes, images are pushed to Amazon ECR
 
-Terraform initializes and plans infrastructure changes.
+Terraform initializes and applies infrastructure changes
 
-ECS services are updated with new container images.
+ECS services are updated with new image versions
 
-Security rule enforced:
-
+Security Enforcement Rule
 Build → Scan → Push → Deploy
 
-If vulnerability scan fails, deployment does not proceed.
+If vulnerability scanning fails, deployment is blocked.
 
 Infrastructure Design
 Networking
 
-ECS services run in private subnets.
+ECS services run in private subnets
 
-ALB is deployed in public subnets.
+Application Load Balancer runs in public subnets
 
-Security groups restrict traffic between ALB and ECS services.
+Monitoring stack uses a private ALB
 
-Internal services use AWS Cloud Map for DNS-based service discovery.
+No public IPs on ECS tasks
+
+Bastion access is provided via AWS SSM Session Manager
+
+No SSH access is enabled
+
+Service Discovery
+
+AWS Cloud Map provides private DNS-based discovery
+
+Services communicate using internal DNS names
+
+Prometheus dynamically discovers scrape targets via Cloud Map
 
 Container Deployment
 
-Each microservice runs as an independent ECS Fargate service.
+Each microservice runs as an independent ECS Fargate service
 
-Autoscaling is configured based on CPU utilization.
+Autoscaling configured based on CPU utilization
 
-Prometheus and Alertmanager are exposed via ALB path rules.
+Stateless service design for application containers
 
-Grafana is configured with secure admin credentials from Secrets Manager.
-
-Secrets Management
-
-Sensitive values are stored in AWS Secrets Manager:
-
-Telegram bot token
-
-Grafana admin credentials
-
-Secrets are injected into containers via ECS task definitions.
-No secrets are hardcoded in the repository.
+Monitoring services deployed separately from application services
 
 Monitoring and Alerting
 Prometheus
 
-Scrapes metrics from services
+Scrapes metrics from ECS services
 
-Tracks CPU and application-level metrics
+Tracks application and container-level metrics
 
-Grafana
-
-Visualizes service performance
-
-Connected to Prometheus as data source
+Uses service discovery instead of static targets
 
 Alertmanager
 
 Receives alerts from Prometheus
 
-Sends notifications to Telegram
+Sends notifications to Telegram using webhook integration
 
-How to Deploy
+Grafana
+
+Connected to Prometheus as a data source
+
+Used for visualizing service metrics
+
+Deployed as a stateless ECS service
+
+Persistent storage (EFS) intentionally not enabled in this version
+
+Note: For production readiness, Grafana persistence should be implemented using Amazon EFS mounted at /var/lib/grafana.
+
+Secrets Management
+
+Sensitive values are securely stored in AWS Secrets Manager, including:
+
+Telegram bot token
+
+Grafana admin credentials
+
+Secrets are injected into ECS tasks at runtime.
+No credentials are hardcoded in the repository.
+
+Deployment Instructions
 Prerequisites
 
 AWS account
@@ -173,7 +198,7 @@ AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 
 Manual Deployment
-git clone <repository-url>
+git clone <repo-url>
 cd terraform
 terraform init
 terraform plan
@@ -181,41 +206,47 @@ terraform apply
 CI/CD Deployment
 
 Push changes to the main branch.
-Pipeline automatically builds, scans, pushes, and deploys.
+GitHub Actions automatically builds, scans, pushes, and deploys services.
 
 Project Structure
 .
-├── src/                      # Microservices source code
-├── monitor/                  # Prometheus and Alertmanager configs
-├── terraform/                # Infrastructure as Code
-├── .github/workflows/        # CI/CD pipeline
+├── src/                    # Microservices source code
+├── monitor/                # Prometheus & Alertmanager configs
+├── terraform/              # Infrastructure as Code
+├── .github/workflows/      # CI/CD pipelines
 └── README.md
 Security Controls
 
 No hardcoded credentials
 
-Secrets stored in AWS Secrets Manager
+Secrets managed via AWS Secrets Manager
 
 Vulnerability scanning before image push
 
-Private networking for ECS tasks
+ECS services in private subnets
 
-Strict security group rules
+Strict security group isolation
 
-Infrastructure managed via Terraform
+Infrastructure fully managed using Terraform
 
 Future Improvements
+
+Grafana persistence using Amazon EFS
+
+HTTPS with ACM on ALBs
 
 Blue/Green deployments
 
 Canary releases
 
-OIDC-based GitHub authentication
+GitHub OIDC authentication
 
-Automated dashboard provisioning
+Automated Grafana dashboard provisioning
 
-Service-level Terraform deployments
+Recording rules in Prometheus
 
-Author : ROHIT NEEL MISHRA
+Author
 
-Microservices infrastructure project demonstrating practical DevOps and cloud engineering implementation.
+Rohit Neel Mishra
+
+Microservices infrastructure project demonstrating practical DevOps, cloud engineering, CI/CD automation, and observability implementation on AWS.

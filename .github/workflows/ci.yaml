@@ -1,4 +1,4 @@
-name: "CI practise"
+name: CI Practise
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
       currencyservice: ${{ steps.filter.outputs.currencyservice }}
       emailservice: ${{ steps.filter.outputs.emailservice }}
       recommendationservice: ${{ steps.filter.outputs.recommendationservice }}
-      shoppingassistant: ${{ steps.filter.outputs.shoppingassistant }} 
+      shoppingassistant: ${{ steps.filter.outputs.shoppingassistant }}
       loadgenerator: ${{ steps.filter.outputs.loadgenerator }}
       prometheus: ${{ steps.filter.outputs.prometheus }}
       alertmanager: ${{ steps.filter.outputs.alertmanager }}
@@ -31,34 +31,20 @@ jobs:
         id: filter
         with:
           filters: |
-            frontend:
-              - 'src/frontend/**'
-            adservice:
-              - 'src/adservice/**'
-            cartservice:
-              - 'src/cartservice/**'
-            checkoutservice:
-              - 'src/checkoutservice/**'
-            productservice:
-              - 'src/productcatalogservice/**'
-            shippingservice:
-              - 'src/shippingservice/**'
-            paymentservice:
-              - 'src/paymentservice/**'
-            currencyservice:
-              - 'src/currencyservice/**'
-            emailservice:
-              - 'src/emailservice/**'
-            recommendationservice:
-              - 'src/recommendationservice/**'
-            shoppingassistant:
-              - 'src/shoppingassistantservice/**'
-            loadgenerator:
-              - 'src/loadgenerator/**'
-            prometheus:
-              - 'monitor/prometheus/**'
-            alertmanager:
-              - 'monitor/alerts/**'
+            frontend: ['src/frontend/**']
+            adservice: ['src/adservice/**']
+            cartservice: ['src/cartservice/**']
+            checkoutservice: ['src/checkoutservice/**']
+            productservice: ['src/productcatalogservice/**']
+            shippingservice: ['src/shippingservice/**']
+            paymentservice: ['src/paymentservice/**']
+            currencyservice: ['src/currencyservice/**']
+            emailservice: ['src/emailservice/**']
+            recommendationservice: ['src/recommendationservice/**']
+            shoppingassistant: ['src/shoppingassistantservice/**']
+            loadgenerator: ['src/loadgenerator/**']
+            prometheus: ['monitor/prometheus/**']
+            alertmanager: ['monitor/alerts/**']
 
   set-version:
     runs-on: ubuntu-latest
@@ -73,15 +59,13 @@ jobs:
     outputs:
       registry: ${{ steps.login-ecr.outputs.registry }}
     steps:
-      - name: aws login
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: aws ecr login
-        id: login-ecr
+      - id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
   codeInteg:
@@ -91,184 +75,146 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - service_name: frontend
+          - name: frontend
             context: ./src/frontend
-            image: frontend
             changed: ${{ needs.detect-changes.outputs.frontend }}
 
-          - service_name: adservice
+          - name: adservice
             context: ./src/adservice
-            image: adservice
             changed: ${{ needs.detect-changes.outputs.adservice }}
 
-          - service_name: cartservice
-            context: ./src/cartservice/src/
-            image: cartservice
+          - name: cartservice
+            context: ./src/cartservice/src
             changed: ${{ needs.detect-changes.outputs.cartservice }}
 
-          - service_name: checkoutservice
+          - name: checkoutservice
             context: ./src/checkoutservice
-            image: checkoutservice
             changed: ${{ needs.detect-changes.outputs.checkoutservice }}
 
-          - service_name: productservice
+          - name: productservice
             context: ./src/productcatalogservice
-            image: productservice
             changed: ${{ needs.detect-changes.outputs.productservice }}
 
-          - service_name: shippingservice
+          - name: shippingservice
             context: ./src/shippingservice
-            image: shippingservice
             changed: ${{ needs.detect-changes.outputs.shippingservice }}
 
-          - service_name: paymentservice
+          - name: paymentservice
             context: ./src/paymentservice
-            image: paymentservice
             changed: ${{ needs.detect-changes.outputs.paymentservice }}
 
-          - service_name: currencyservice
+          - name: currencyservice
             context: ./src/currencyservice
-            image: currencyservice
             changed: ${{ needs.detect-changes.outputs.currencyservice }}
 
-          - service_name: emailservice
+          - name: emailservice
             context: ./src/emailservice
-            image: emailservice
             changed: ${{ needs.detect-changes.outputs.emailservice }}
 
-          - service_name: recommendationservice
+          - name: recommendationservice
             context: ./src/recommendationservice
-            image: recommendationservice
             changed: ${{ needs.detect-changes.outputs.recommendationservice }}
 
-          - service_name: shoppingassistantservice
+          - name: shoppingassistant
             context: ./src/shoppingassistantservice
-            image: shoppingassistant
             changed: ${{ needs.detect-changes.outputs.shoppingassistant }}
 
-          - service_name: loadgenerator
+          - name: loadgenerator
             context: ./src/loadgenerator
-            image: loadgenerator
             changed: ${{ needs.detect-changes.outputs.loadgenerator }}
 
-          - service_name: prometheus
+          - name: prometheus
             context: ./monitor/prometheus
-            image: prometheus
             changed: ${{ needs.detect-changes.outputs.prometheus }}
 
-          - service_name: alertmanager
+          - name: alertmanager
             context: ./monitor/alerts
-            image: alertmanager
             changed: ${{ needs.detect-changes.outputs.alertmanager }}
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: aws login
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: aws ecr login
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Check if image exists in ECR
-        id: image-check
+      - name: Create ECR repo if missing
         run: |
-         aws ecr describe-images \
-         --repository-name ${{ matrix.image }} \
-         --image-ids imageTag=latest \
-         --region us-east-1 > /dev/null 2>&1 && \
-         echo "exists=true" >> $GITHUB_OUTPUT || \
-         echo "exists=false" >> $GITHUB_OUTPUT
+          aws ecr describe-repositories --repository-names ${{ matrix.name }} || \
+          aws ecr create-repository --repository-name ${{ matrix.name }}
 
-      - name: Create ECR repository if needed
-        run: |
-          aws ecr describe-repositories --repository-names ${{ matrix.image }} --region us-east-1 || \
-          aws ecr create-repository --repository-name ${{ matrix.image }} --region us-east-1
-      
       - name: Build image
+        if: matrix.changed == 'true'
         run: |
-           docker build \
-           -t ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
-           ${{ matrix.context }}
+          docker build -t ${{ matrix.name }}:${{ needs.set-version.outputs.version }} ${{ matrix.context }}
 
-      - name: Trivy scan
-        uses: aquasecurity/trivy-action@0.33.1 
+      - name: Trivy scan (BLOCKER)
+        if: matrix.changed == 'true'
+        uses: aquasecurity/trivy-action@0.33.1
         with:
-         version: 'v0.69.1' 
-         image-ref: ${{ matrix.image }}:${{ needs.set-version.outputs.version }}
-         format: 'table'
-         exit-code: 0
-         ignore-unfixed: true
-         vuln-type: 'os,library'
-         severity: 'CRITICAL,HIGH'
-         trivy-flags: '--skip-version-check' 
+          image-ref: ${{ matrix.name }}:${{ needs.set-version.outputs.version }}
+          severity: CRITICAL,HIGH
+          vuln-type: os,library
+          exit-code: 1
+          ignore-unfixed: true
 
-      - name: Tag and Push to ECR 
+      - name: Push image
+        if: matrix.changed == 'true'
         run: |
-          docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
-          ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
+          docker tag ${{ matrix.name }}:${{ needs.set-version.outputs.version }} \
+          ${{ needs.get-registry.outputs.registry }}/${{ matrix.name }}:${{ needs.set-version.outputs.version }}
 
-          docker tag ${{ matrix.image }}:${{ needs.set-version.outputs.version }} \
-          ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
+          docker tag ${{ matrix.name }}:${{ needs.set-version.outputs.version }} \
+          ${{ needs.get-registry.outputs.registry }}/${{ matrix.name }}:latest
 
-          docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:${{ needs.set-version.outputs.version }}
-          docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
+          docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.name }}:${{ needs.set-version.outputs.version }}
+          docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.name }}:latest
 
   deploy-infra:
-    needs: [codeInteg, set-version, get-registry]
-    if: success()
+    needs: [codeInteg, get-registry]
+    if: needs.codeInteg.result == 'success'
     runs-on: ubuntu-latest
     concurrency:
       group: terraform
       cancel-in-progress: true
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
 
-      - name: aws login
-        uses: aws-actions/configure-aws-credentials@v4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
-      - name: Terraform init
+      - run: terraform init -reconfigure
         working-directory: terraform
-        run: |
-             terraform init -reconfigure
 
-      - name: Terraform plan
+      - run: |
+          terraform plan -out=tfplan \
+          -var="frontend_image=${{ needs.get-registry.outputs.registry }}/frontend:latest" \
+          -var="ad_image=${{ needs.get-registry.outputs.registry }}/adservice:latest" \
+          -var="cart_image=${{ needs.get-registry.outputs.registry }}/cartservice:latest" \
+          -var="checkout_image=${{ needs.get-registry.outputs.registry }}/checkoutservice:latest" \
+          -var="product_image=${{ needs.get-registry.outputs.registry }}/productservice:latest" \
+          -var="shipping_image=${{ needs.get-registry.outputs.registry }}/shippingservice:latest" \
+          -var="payment_image=${{ needs.get-registry.outputs.registry }}/paymentservice:latest" \
+          -var="currency_img=${{ needs.get-registry.outputs.registry }}/currencyservice:latest" \
+          -var="email_Img=${{ needs.get-registry.outputs.registry }}/emailservice:latest" \
+          -var="recomandation_image=${{ needs.get-registry.outputs.registry }}/recommendationservice:latest" \
+          -var="assitant_image=${{ needs.get-registry.outputs.registry }}/shoppingassistant:latest" \
+          -var="load_Img=${{ needs.get-registry.outputs.registry }}/loadgenerator:latest" \
+          -var="prometheus=${{ needs.get-registry.outputs.registry }}/prometheus:latest" \
+          -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:latest"
         working-directory: terraform
-        run: |  
-          terraform plan -out=tf3plan \
-          -var="aws_region=us-east-1" \
-          -var="frontend_image=${{ needs.get-registry.outputs.registry }}/frontend:${{ needs.set-version.outputs.version }}" \
-          -var="ad_image=${{ needs.get-registry.outputs.registry }}/adservice:${{ needs.set-version.outputs.version }}" \
-          -var="cart_image=${{ needs.get-registry.outputs.registry }}/cartservice:${{ needs.set-version.outputs.version }}" \
-          -var="checkout_image=${{ needs.get-registry.outputs.registry }}/checkoutservice:${{ needs.set-version.outputs.version }}" \
-          -var="product_image=${{ needs.get-registry.outputs.registry }}/productservice:${{ needs.set-version.outputs.version }}" \
-          -var="shipping_image=${{ needs.get-registry.outputs.registry }}/shippingservice:${{ needs.set-version.outputs.version }}" \
-          -var="payment_image=${{ needs.get-registry.outputs.registry }}/paymentservice:${{ needs.set-version.outputs.version }}" \
-          -var="currency_img=${{ needs.get-registry.outputs.registry }}/currencyservice:${{ needs.set-version.outputs.version }}" \
-          -var="email_Img=${{ needs.get-registry.outputs.registry }}/emailservice:${{ needs.set-version.outputs.version }}" \
-          -var="recomandation_image=${{ needs.get-registry.outputs.registry }}/recommendationservice:${{ needs.set-version.outputs.version }}" \
-          -var="assitant_image=${{ needs.get-registry.outputs.registry }}/shoppingassistant:${{ needs.set-version.outputs.version }}" \
-          -var="load_Img=${{ needs.get-registry.outputs.registry }}/loadgenerator:${{ needs.set-version.outputs.version }}" \
-          -var="prometheus=${{ needs.get-registry.outputs.registry }}/prometheus:${{ needs.set-version.outputs.version }}" \
-          -var="alertmanager=${{ needs.get-registry.outputs.registry }}/alertmanager:${{ needs.set-version.outputs.version }}"
 
-      - name: Terraform apply
-        run: |
-            cd terraform
-            terraform apply -auto-approve tf3plan
+      - run: terraform apply -auto-approve tfplan
+        working-directory: terraform
