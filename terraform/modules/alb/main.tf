@@ -157,6 +157,6 @@ resource "aws_lb_listener" "grafana" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.grafana_tg.arn
+    target_group_arn = aws_lb_target_group.grafna_tg.arn
   }
 }
