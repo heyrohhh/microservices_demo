@@ -122,7 +122,14 @@ ingress {
         to_port= 65535
         protocol= "tcp"
     }
+ ingress {
+        description = "redis scrapping by prom"
+        from_port= 9121
+        to_port= 9121
+        protocol= "tcp"
+        security_groups = [aws_security_group.prom_sg.id]
 
+    }
     egress {
         from_port= 0
         to_port = 0
