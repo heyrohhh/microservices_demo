@@ -221,7 +221,7 @@ jobs:
   #         docker push ${{ needs.get-registry.outputs.registry }}/${{ matrix.image }}:latest
 
   deploy-infra:
-    needs: [codeInteg, set-version, get-registry]
+    # needs: [codeInteg, set-version, get-registry]
     # if: success()
     runs-on: ubuntu-latest
     # concurrency:
